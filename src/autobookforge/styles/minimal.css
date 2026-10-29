@@ -1,0 +1,58 @@
+/* =====================================================================
+   AutoBookForge -- minimal.css  简约风格
+   无衬线、克制留白、零装饰。适合报告与通用读物。
+
+   若把嵌入档位设为 none，正文走系统无衬线字体（Noto Sans CJK SC 等）；
+   嵌入正文字体后，正文改用所嵌字体，本风格仍以行高与留白区分。
+   ===================================================================== */
+
+body {
+  font-family: var(--abf-font-ui, "Noto Sans CJK SC", "PingFang SC",
+    "Microsoft YaHei", Helvetica, Arial, sans-serif);
+  line-height: 1.68;
+  color: var(--abf-ink, #202220);
+  letter-spacing: 0.005em;
+}
+
+p {
+  margin: 0 0 0.62em;
+}
+
+h1 {
+  margin: 1.1em 0 1.4em;
+  font-size: 1.42em;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--abf-ink, #202220);
+}
+
+h1::after {
+  display: block;
+  content: "";
+  width: 34px;
+  height: 2px;
+  margin: 0.6em auto 0;
+  background: var(--abf-vermilion, #A8332B);
+}
+
+h2, h3 {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+blockquote {
+  border-left-color: var(--abf-rule-strong, #C4BEB0);
+  color: var(--abf-ink-soft, #4A4E48);
+}
+
+hr {
+  width: 30%;
+  border-top-color: var(--abf-rule, #DCD8CE);
+}
+
+.volume-title {
+  color: var(--abf-ink-soft, #4A4E48);
+  font-weight: 500;
+  border-top: 0;
+  border-bottom: 0;
+}

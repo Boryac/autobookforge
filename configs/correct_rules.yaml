@@ -1,0 +1,26 @@
+# =====================================================================
+# 纠错引擎配置（双层：规则层 + 统计层）
+# =====================================================================
+
+rule_layer:
+  enabled: true
+  min_confidence: 0.90
+  categories:
+    - homophone       # 同音错别字
+    - punctuation     # 标点误用
+    - collocation     # 词语搭配
+    - duplication     # 重复字词
+  custom_rule_files:
+    - "corrector/data/custom_rules.json"
+
+statistical_layer:
+  enabled: true
+  module: ngram
+  threshold: 0.82          # 高置信度阈值，低于此值不输出修正
+  context_window: 3        # 上下文窗口（字）
+  cache: true              # 纠错结果缓存，重复文本零成本
+
+report:
+  include_positions: true  # 报告中标注字符位置
+  include_source: true     # 标注来源层级（rule / ngram）
+  max_entries: 5000

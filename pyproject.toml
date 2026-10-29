@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autobookforge"
+version = "1.0.0"
+description = "AutoBookForge - 全自动 TXT 精排电子书生产引擎（零 API 成本，纯本地 CPU）"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "AutoBookForge" }]
+keywords = ["epub", "txt", "ebook", "typesetting", "chinese"]
+dependencies = [
+    "charset-normalizer>=3.0",
+    "ebooklib>=0.18",
+    "typer>=0.9",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+    "watchdog>=4.0",
+    "PyYAML>=6.0",
+    "beautifulsoup4>=4.12",
+    "lxml>=5.0",
+    "python-multipart>=0.0.9",
+    "jinja2>=3.1",
+    "Pillow>=10.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+cover = ["playwright>=1.40"]
+
+[project.scripts]
+autobookforge = "autobookforge.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+autobookforge = ["styles/*.css", "cover/templates/*.html", "corrector/data/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

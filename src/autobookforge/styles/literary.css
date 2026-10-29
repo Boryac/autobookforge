@@ -1,0 +1,60 @@
+/* =====================================================================
+   AutoBookForge -- literary.css  文艺风格
+   衬线正文、宽行高、章首菱形饰、花式分隔符。适合小说与散文。
+   默认正文字体：霞鹜文楷（可覆盖）。
+   ===================================================================== */
+
+body {
+  font-family: var(--abf-font-body, "Noto Serif CJK SC", "Songti SC",
+    "SimSun", serif);
+  line-height: 1.82;
+  color: var(--abf-ink, #26241f);
+  letter-spacing: 0.012em;
+}
+
+p {
+  margin: 0 0 0.4em;
+}
+
+h1 {
+  margin: 1.8em 0 1.5em;
+  font-size: 1.5em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--abf-ink, #2b2922);
+}
+
+h1::after {
+  display: block;
+  content: "\2756";
+  margin: 0.75em auto 0;
+  color: var(--abf-vermilion-soft, #C96A5E);
+  font-size: 0.62em;
+  letter-spacing: 0.5em;
+  text-indent: 0.5em;
+}
+
+h2 {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--abf-ink-soft, #3a382f);
+}
+
+blockquote {
+  border-left-color: var(--abf-vermilion-soft, #C96A5E);
+  color: var(--abf-ink-soft, #57544a);
+  font-style: normal;
+}
+
+hr {
+  width: 60%;
+  border-top-color: var(--abf-rule-strong, #C4BEB0);
+}
+
+.volume-title {
+  color: var(--abf-vermilion, #A8332B);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  border-top: 0;
+  border-bottom: 0;
+}

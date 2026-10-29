@@ -1,0 +1,151 @@
+# =====================================================================
+# 章节识别配置
+#
+# 分章采用「书内自适应标记族」策略：同时探测多族写法，逐族做序号单调性过滤，
+# 再做族间并集与邻近重复合并。因此在同一本书内混用多种标记（例如前 20 章用裸数字、
+# 后 30 章用「站点名--正章N」）也能正确切分。
+#
+# families 段的每一项：
+#   name          族名（出现在报告里）
+#   kind          volume | chapter | section
+#   priority      优先级，同一行命中多族时取高者
+#   pattern       正则
+#   number_group  序号所在捕获组（0 表示无序号）
+#   title_group   标题文字所在捕获组（0 表示无）
+#   weak          弱族：必须被空行前后夹住才可信（防止正文数字被误判）
+#   label         标题缺失时的回退模板，{} 为序号
+#
+# 删除整个 families 段即回退到代码内置族（推荐保留本文件以显式控制）。
+# 新增一种写法只需追加一项，无需改代码。
+# =====================================================================
+
+families:
+  # ---------------- 卷 ----------------
+  - name: vol_di
+    kind: volume
+    priority: 100
+    pattern: '^第\s*([0-9〇零一二三四五六七八九十百千万两壹贰叁肆伍陆柒捌玖拾佰仟]{1,8})\s*[卷部篇]\s*(?:[　\s:：、.．\-—]*(.{0,40}))?$'
+    number_group: 1
+    title_group: 2
+    label: '第{}卷'
+
+  - name: vol_scope
+    kind: volume
+    priority: 96
+    pattern: '^([上中下])\s*[篇部卷]\s*(.{0,36})$'
+    number_group: 0
+    title_group: 0
+    label: '{}篇'
+
+  # ---------------- 章 ----------------
+  - name: chap_special
+    kind: chapter
+    priority: 94
+    pattern: '^(序章|序言|序|楔子|引子|尾声|终章|后记|後記|番外|完本感言|作者的话|作者的話|完结感言)\s*[:：、.．]?\s*(.{0,34})$'
+    number_group: 0
+    title_group: 0
+    label: '{}'
+
+  - name: chap_di
+    kind: chapter
+    priority: 92
+    pattern: '^第\s*([0-9〇零一二三四五六七八九十百千万两壹贰叁肆伍陆柒捌玖拾佰仟]{1,8})\s*[章回]\s*(?:[　\s:：、.．\-—]*(.{0,40}))?$'
+    number_group: 1
+    title_group: 2
+    label: '第{}章'
+
+  - name: chap_zhang_en
+    kind: chapter
+    priority: 88
+    pattern: '^(?:Chapter|CHAPTER|chapter)\s*([0-9]{1,4})\s*[.、:：\-]?\s*(.{0,56})$'
+    number_group: 1
+    title_group: 2
+    label: 'Chapter {}'
+
+  # 站点水印式：熊熊小说--正章7 / 【某站】第8章 / 某某书屋——9
+  - name: chap_site_prefix
+    kind: chapter
+    priority: 86
+    pattern: '^(?:[【\[][^】\]]{0,12}[】\]]|[^\s]{1,12}(?:小说|書屋|书屋|书院|書院|书盟|文学|文学网)\s*(?:--|——|－|—|-))\s*(正章|第)?\s*([0-9]{1,4})\s*章?\s*(.{0,40})$'
+    number_group: 2
+    title_group: 3
+    label: '正章{}'
+
+  # 古风 / 台版： 《一》课堂风云
+  - name: chap_book_num
+    kind: chapter
+    priority: 84
+    pattern: '^《\s*([0-9〇零一二三四五六七八九十百千万两]{1,6})\s*》\s*(.{0,40})$'
+    number_group: 1
+    title_group: 2
+    label: '第{}章'
+
+  # 方括号式： 【3】xxx / (12) xxx
+  - name: chap_bracket_num
+    kind: chapter
+    priority: 82
+    pattern: '^[【〔〖\[（(]\s*([0-9〇零一二三四五六七八九十百千万两]{1,6})\s*[】〕〗\]）)]\s*(.{0,40})$'
+    number_group: 1
+    title_group: 2
+    label: '第{}章'
+
+  # 手打体： 1、 / 10、标题   （负向断言排除 3.1 这类小节号）
+  - name: chap_num_dun
+    kind: chapter
+    priority: 74
+    pattern: '^([0-9]{1,3})\s*[、.．]\s*(?!\d)(.{0,40})$'
+    number_group: 1
+    title_group: 2
+    label: '第{}章'
+
+  - name: chap_num_cn_dun
+    kind: chapter
+    priority: 72
+    pattern: '^([〇零一二三四五六七八九十]{1,4})\s*[、.．]\s*(.{0,40})$'
+    number_group: 1
+    title_group: 2
+    label: '第{}章'
+
+  # ---------------- 节 ----------------
+  - name: sec_dot
+    kind: section
+    priority: 62
+    pattern: '^([0-9]{1,2})\.([0-9]{1,2})(?!\d)\s+(.{0,50})$'
+    number_group: 1
+    number_group2: 2
+    title_group: 3
+    label: '{}'
+
+  - name: sec_bracket
+    kind: section
+    priority: 58
+    pattern: '^[（(]\s*([0-9〇零一二三四五六七八九十]{1,4})\s*[）)]\s*(.{0,40})$'
+    number_group: 1
+    title_group: 2
+    label: '第{}节'
+
+  # ---------------- 弱族（须被空行夹住）----------------
+  # 裸数字占一行：分卷下载器最常见的写法
+  - name: bare_num
+    kind: chapter
+    priority: 44
+    pattern: '^([0-9]{1,4})$'
+    number_group: 1
+    title_group: 0
+    weak: true
+    label: '第{}章'
+
+  - name: num_space
+    kind: chapter
+    priority: 40
+    pattern: '^([0-9]{1,4})\s+([^\s0-9].{0,36})$'
+    number_group: 1
+    title_group: 2
+    weak: true
+    label: '第{}章'
+
+# 章节切分约束
+constraints:
+  min_chapter_length: 100      # 短于此长度的“章”视为误判（仅用于质量告警）
+  max_chapter_length: 50000    # 长于此长度的章会触发内部二次切分与告警
+  require_continuity: true

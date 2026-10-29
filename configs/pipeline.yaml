@@ -1,0 +1,68 @@
+# =====================================================================
+# AutoBookForge 流水线配置
+# 修改本文件即可参数化各处理步骤，无需改动代码。
+# =====================================================================
+
+input: "./novels/*.txt"
+output: "./output/{bookname}.{ext}"
+
+# 书名/作者：留空则自动推断（书名取首个非空行或文件名，作者取「作者：xxx」）
+meta:
+  title: ""
+  author: ""
+  language: "zh"
+
+steps:
+  - name: encoding_detect
+    module: charset-normalizer
+    options:
+      fallback: [utf-8, gbk, gb18030, big5]
+
+  - name: text_clean
+    module: clear-book
+    options:
+      smart_linebreak: true       # 按中文标点合并断裂句
+      paragraph_indent: true      # 段落首行写入两个全角空格（硬缩进）
+      remove_ads: true            # 正则清理下载器水印/群号推广
+      normalize_spaces: true      # 去除行内多余空格与零宽字符
+      ad_patterns:
+        - ".*下载器.*"
+        - ".*分卷阅读.*"
+        - ".*更多精彩.*"
+        - ".*请记住本书.*"
+        - ".*(www|http|https)\\S*\\..*"
+        - ".*[Qq][Qq]群?\\s*[:：]?\\s*\\d+.*"
+        - ".*(笔趣阁|顶点|无错|全本|txt免费).*"
+
+  - name: chapter_split
+    module: txt-to-epub-converter
+    options:
+      min_chapter_length: 100
+      max_chapter_length: 50000
+      detect_volume: true
+      detect_section: true
+
+  - name: correct
+    layers:
+      - name: rule
+        module: young-corrector
+        enabled: true
+      - name: ngram
+        module: pycorrector-kenlm   # 本地轻量统计层（可插拔替换真实 KenLM）
+        enabled: true                # 设为 false 则跳过统计层
+
+  - name: typeset
+    module: vivliostyle
+    style: literary                  # minimal / literary / business / classic
+
+  - name: cover
+    enabled: true
+    module: mondo-poster
+    style: auto                      # auto / literary / tech / business / design
+
+  - name: epub_build
+    module: ebooklib
+
+  - name: format_convert
+    module: calibre
+    formats: [epub]                  # 可加 mobi / azw3（需安装 Calibre）

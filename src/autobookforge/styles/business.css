@@ -1,0 +1,67 @@
+/* =====================================================================
+   AutoBookForge -- business.css  商务风格
+   紧凑、高信息密度、左对齐标题、强秩序感。适合报告与非虚构。
+   ===================================================================== */
+
+body {
+  font-family: var(--abf-font-ui, "Noto Sans CJK SC", "PingFang SC",
+    "Microsoft YaHei", Helvetica, Arial, sans-serif);
+  font-size: 0.96em;
+  line-height: 1.56;
+  color: var(--abf-ink, #1f2124);
+  letter-spacing: 0;
+}
+
+p {
+  margin: 0 0 0.42em;
+}
+
+h1 {
+  margin: 1em 0 0.9em;
+  padding-bottom: 0.32em;
+  font-size: 1.28em;
+  font-weight: 600;
+  text-align: left;
+  letter-spacing: 0;
+  color: var(--abf-ink, #14161a);
+  border-bottom: 2px solid var(--abf-ink, #202220);
+}
+
+h1::after {
+  content: none;
+}
+
+h2 {
+  margin: 0.9em 0 0.5em;
+  font-size: 1.1em;
+  font-weight: 600;
+  text-align: left;
+}
+
+h3, h4 {
+  text-align: left;
+  font-weight: 600;
+}
+
+blockquote {
+  margin: 0.6em 0.4em;
+  padding-left: 0.7em;
+  border-left: 3px solid var(--abf-ink, #202220);
+  color: var(--abf-ink-soft, #4b4f55);
+  font-size: 0.96em;
+}
+
+hr {
+  width: 100%;
+  margin: 1em 0;
+  border-top-color: var(--abf-ink, #202220);
+}
+
+.volume-title {
+  margin: 1.6em 0;
+  font-size: 1.4em;
+  text-align: left;
+  letter-spacing: 0.02em;
+  border-top: 0;
+  border-bottom: 2px solid var(--abf-ink, #202220);
+}

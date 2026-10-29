@@ -1,0 +1,227 @@
+/* ===========================================================================
+   AutoBookForge 版式令牌（设计变量）
+   ---------------------------------------------------------------------------
+   所有风格共用的基础层，加载顺序在具体风格之前。
+
+   兼容策略：每条 var() 都带字面值兜底。老 Kindle 与部分国产阅读器不支持
+   CSS 自定义属性，此时自动退到兜底值，版面不会崩。
+
+   字体变量（--abf-font-*）由运行时生成的 typography.css 覆盖；未嵌入字体时
+   保持本文件中的系统回退链。
+   =========================================================================== */
+
+:root {
+  /* ---- 颜色：纸墨朱三色 ---- */
+  --abf-paper:      #FBFAF7;   /* 纸白，仅扉页与卡片使用，正文不设底 */
+  --abf-card:       #F4F1EA;   /* 卡片/扉页底 */
+  --abf-ink:        #1F2220;   /* 正文墨色 */
+  --abf-ink-soft:   #4A4E48;   /* 次级文字 */
+  --abf-muted:      #8C8F86;   /* 弱化信息：图注、页脚 */
+  --abf-vermilion:  #A8332B;   /* 朱红，全书唯一强调色 */
+  --abf-vermilion-soft: #C96A5E;
+  --abf-rule:       #DCD8CE;   /* 分隔线 */
+  --abf-rule-strong:#C4BEB0;
+  --abf-shade:      #EFEDE6;   /* 引文底 */
+
+  /* 兼容旧变量名（早期 styles/*.css 使用） */
+  --ink: var(--abf-ink);
+  --muted: var(--abf-muted);
+  --accent: var(--abf-vermilion);
+  --line: var(--abf-rule);
+
+  /* ---- 字体：内嵌 -> 系统同风格 -> generic 三层回退 ---- */
+  --abf-font-body:  "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", SimSun, STSong, serif;
+  --abf-font-title: "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", SimSun, serif;
+  --abf-font-quote: "STFangsong", "FangSong", "Noto Serif CJK SC", serif;
+  --abf-font-note:  "Kaiti SC", "STKaiti", KaiTi, "Noto Serif CJK SC", serif;
+  --abf-font-ui:    "Noto Sans CJK SC", "PingFang SC", "Microsoft YaHei", "Heiti SC", sans-serif;
+
+  /* ---- 字号（相对单位，随阅读器缩放）---- */
+  --abf-size-body:   1em;
+  --abf-size-h1:     1.5em;
+  --abf-size-h2:     1.25em;
+  --abf-size-h3:     1.1em;
+  --abf-size-quote:  0.95em;
+  --abf-size-note:   0.86em;
+  --abf-size-caption:0.84em;
+  --abf-size-ui:     0.9em;
+
+  /* ---- 行高（无单位数值）---- */
+  --abf-lh-body:  1.8;
+  --abf-lh-title: 1.45;
+  --abf-lh-quote: 1.75;
+
+  /* ---- 字距：中文正文不加负字距 ---- */
+  --abf-tracking-body:  0.01em;
+  --abf-tracking-title: 0.06em;
+
+  /* ---- 段落 ---- */
+  --abf-indent:      2em;      /* 首行缩进：CSS 模式下生效 */
+  --abf-para-gap:    0;        /* 段间距：与缩进二选一 */
+  --abf-para-spacing: 0.55em;  /* 零缩进模式的段间距 */
+
+  /* ---- 间距 ---- */
+  --abf-space-h1-before: 0em;
+  --abf-space-h1-after:  1.6em;
+  --abf-space-h2-before: 1.6em;
+  --abf-space-h2-after:  0.8em;
+  --abf-space-block:     1.2em;
+
+  /* ---- 装饰 ---- */
+  --abf-rule-color:   var(--abf-vermilion, #A8332B);
+  --abf-rule-heaviness: 1px;
+  --abf-ornament-size:  0.78em;
+
+  /* ---- 图片 ---- */
+  --abf-figure-max: 100%;
+  --abf-figure-radius: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   基线：让所有元素从同一套默认值出发
+   --------------------------------------------------------------------------- */
+html {
+  font-size: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  color: var(--abf-ink, #1F2220);
+  font-family: var(--abf-font-body, serif);
+  font-size: var(--abf-size-body, 1em);
+  line-height: var(--abf-lh-body, 1.8);
+  letter-spacing: var(--abf-tracking-body, 0.01em);
+  text-align: justify;
+  -webkit-hyphens: none;
+  hyphens: none;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* 正文不设底色：避免与阅读器深色主题冲突 */
+
+p {
+  margin: 0;
+  padding: 0;
+  text-indent: var(--abf-indent, 2em);
+  orphans: 2;
+  widows: 2;
+}
+
+/* ---------------------------------------------------------------------------
+   缩进模式：容器类由构建期写入（abf-indent-space / abf-indent-css /
+   abf-indent-spacing），作者不需要在每个风格里重复处理缩进。
+   - css     : 纯 CSS 首行缩进 2em，随字号缩放（正确，但老 Kindle 可能丢）
+   - space   : 缩进由正文全角空格承担，CSS 置 0（最兼容，但缩进不随字号缩放）
+   - spacing : 零缩进 + 段间距（西式排版）
+   --------------------------------------------------------------------------- */
+.abf-indent-space p {
+  text-indent: 0;
+}
+
+.abf-indent-spacing p {
+  text-indent: 0;
+  margin-bottom: var(--abf-para-spacing, 0.55em);
+}
+
+/* 段首不缩进的场景 */
+p.no-indent,
+p.center,
+.center,
+.epub-author,
+figcaption,
+.toc-item,
+em,
+cite {
+  text-indent: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   图片与图注
+   --------------------------------------------------------------------------- */
+img {
+  max-width: var(--abf-figure-max, 100%);
+  height: auto;
+}
+
+figure {
+  margin: var(--abf-space-block, 1.2em) 0;
+  padding: 0;
+  text-align: center;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+figure img,
+figure svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+
+figcaption {
+  margin-top: 0.5em;
+  color: var(--abf-muted, #8C8F86);
+  font-family: var(--abf-font-note, serif);
+  font-size: var(--abf-size-caption, 0.84em);
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------------------
+   引文 / 注文 / 分隔
+   --------------------------------------------------------------------------- */
+blockquote {
+  margin: var(--abf-space-block, 1.2em) 0;
+  padding: 0 1.2em;
+  color: var(--abf-ink-soft, #4A4E48);
+  font-family: var(--abf-font-quote, serif);
+  font-size: var(--abf-size-quote, 0.95em);
+  line-height: var(--abf-lh-quote, 1.75);
+  text-indent: 0;
+}
+
+blockquote p {
+  text-indent: 0;
+}
+
+hr {
+  margin: 1.6em auto;
+  width: 30%;
+  border: 0;
+  border-top: var(--abf-rule-heaviness, 1px) solid var(--abf-rule, #DCD8CE);
+}
+
+/* ---------------------------------------------------------------------------
+   目录
+   --------------------------------------------------------------------------- */
+nav#toc ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+nav#toc ol ol {
+  padding-left: 1.2em;
+}
+
+nav#toc a {
+  color: var(--abf-ink, #1F2220);
+  text-decoration: none;
+}
+
+/* ---------------------------------------------------------------------------
+   竖排（可选，仅少数阅读器支持良好）
+   --------------------------------------------------------------------------- */
+.abf-vertical {
+  writing-mode: vertical-rl;
+  -webkit-writing-mode: vertical-rl;
+  text-align: justify;
+  line-height: var(--abf-lh-body, 1.8);
+}
+
+.abf-vertical p {
+  text-indent: 1em;
+}

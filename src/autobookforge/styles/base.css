@@ -1,0 +1,105 @@
+/* ===========================================================================
+   AutoBookForge -- base.css（EPUB 兼容层）
+   ---------------------------------------------------------------------------
+   加载顺序：_tokens.css -> base.css -> 风格 css -> typography.css
+
+   本文件只做两件事：
+   1) 结构性与兼容性处理（封面页、目录页、分页保护、溢出保护）；
+   2) 不重复 _tokens.css 的版式基线（字体、行高、缩进、颜色）。
+
+   注意：正文**不设底色**。给 body 加 background 会和阅读器的深色主题打架，
+   读者切到夜间模式后会得到浅底黑字的错误组合。需要底色的元素
+   （扉页卡片、引文框）在风格文件里单独指定。
+   =========================================================================== */
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ---- 分页保护：标题不落在页尾 ---- */
+h1, h2, h3, h4 {
+  break-after: avoid;
+  page-break-after: avoid;
+  break-inside: avoid;
+}
+
+/* ---- 溢出保护 ---- */
+img, svg, table, pre {
+  max-width: 100%;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+pre, code {
+  font-family: "Noto Sans Mono CJK SC", "Menlo", "Consolas", monospace;
+  font-size: 0.9em;
+}
+
+/* ---- 封面页 ---- */
+.cover-page {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  break-after: page;
+  page-break-after: always;
+}
+
+.cover-page img {
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0 auto;
+}
+
+/* ---- 目录页 ---- */
+.toc-title {
+  margin: 1.4em 0 1.2em;
+  font-size: 1.4em;
+  text-align: center;
+  text-indent: 0;
+}
+
+.toc-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.toc-list li {
+  margin: 0.34em 0;
+  line-height: 1.55;
+  text-indent: 0;
+}
+
+.toc-list a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.toc-list .toc-level-1 {
+  margin-top: 0.8em;
+  font-weight: 600;
+}
+
+.toc-list .toc-level-3 {
+  padding-left: 1.4em;
+  font-size: 0.94em;
+}
+
+/* ---- 正文容器 ---- */
+.chapter-body > p:first-of-type {
+  text-indent: 0;
+}
+
+/* ---- 分节页 ---- */
+.chapter {
+  break-before: page;
+  page-break-before: always;
+}
+
+.chapter:first-of-type {
+  break-before: auto;
+  page-break-before: auto;
+}

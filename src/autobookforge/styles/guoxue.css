@@ -1,0 +1,366 @@
+/* ===========================================================================
+   AutoBookForge 国学精排风格（guoxue）
+   ---------------------------------------------------------------------------
+   设计语言：纸白、墨黑、朱红单强调色；章节饰条、纸笺扉页、圆圈注号、
+   图注与规整留白。依赖 _tokens.css 提供的变量。
+
+   降级原则：所有装饰性元素（::before / ::after 内容、细线）在低支持度
+   阅读器上丢失后，剩下的结构（居中标题、正确层级、正确分页）仍然成立。
+   =========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   一、页面与留白
+   ---------------------------------------------------------------------------
+   @page 的边距框（@top-center）属于 CSS Paged Media，只有少数排版引擎
+   （Vivliostyle / Prince）会渲染；主流 reflowable 阅读器忽略它。
+   保留在这里是零成本的：支持的引擎得到页眉纹样，不支持的自动跳过。
+   --------------------------------------------------------------------------- */
+@page {
+  margin: 1.6em 1.4em 1.8em 1.4em;
+}
+
+@page :first {
+  margin-top: 2.4em;
+}
+
+/* ---------------------------------------------------------------------------
+   二、正文
+   --------------------------------------------------------------------------- */
+body {
+  font-family: var(--abf-font-body, serif);
+  color: var(--abf-ink, #1F2220);
+  line-height: var(--abf-lh-body, 1.8);
+}
+
+/* 章首第一段不缩进（书名号或引号起首时更整齐） */
+.chapter-body > p:first-of-type,
+h1 + p,
+h2 + p {
+  text-indent: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   三、标题体系
+   --------------------------------------------------------------------------- */
+
+/* 章题：居中、宽字距、上下饰条 */
+h1.chapter-title {
+  margin: var(--abf-space-h1-before, 0) 0 var(--abf-space-h1-after, 1.6em);
+  color: var(--abf-ink, #1F2220);
+  font-family: var(--abf-font-title, serif);
+  font-size: var(--abf-size-h1, 1.5em);
+  font-weight: 500;
+  line-height: var(--abf-lh-title, 1.45);
+  letter-spacing: var(--abf-tracking-title, 0.06em);
+  text-align: center;
+  text-indent: 0;
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+/* 章题上方的朱红纹样 */
+h1.chapter-title::before {
+  display: block;
+  content: "\2756";
+  margin: 0 0 0.55em;
+  color: var(--abf-vermilion, #A8332B);
+  font-size: 0.62em;
+  letter-spacing: 0.55em;
+  text-indent: 0.55em; /* 抵消字距造成的视觉偏移 */
+  line-height: 1;
+}
+
+/* 章题下方的细线 */
+h1.chapter-title::after {
+  display: block;
+  content: "";
+  width: 3.2em;
+  height: 0;
+  margin: 0.75em auto 0;
+  border-top: 1px solid var(--abf-rule-strong, #C4BEB0);
+}
+
+/* 卷题：更重、更多留白、上下双线 */
+h1.volume-title {
+  margin: 0 0 2em;
+  padding: 0.9em 0;
+  color: var(--abf-ink, #1F2220);
+  font-family: var(--abf-font-title, serif);
+  font-size: 1.68em;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.16em;
+  text-align: center;
+  text-indent: 0;
+  border-top: 3px double var(--abf-rule-strong, #C4BEB0);
+  border-bottom: 3px double var(--abf-rule-strong, #C4BEB0);
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+/* 节题 */
+h2.section-title,
+h2 {
+  margin: var(--abf-space-h2-before, 1.6em) 0 var(--abf-space-h2-after, 0.8em);
+  color: var(--abf-ink, #1F2220);
+  font-family: var(--abf-font-title, serif);
+  font-size: var(--abf-size-h2, 1.25em);
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.05em;
+  text-indent: 0;
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+h2::before {
+  content: "\2014\A0";
+  color: var(--abf-vermilion, #A8332B);
+}
+
+h3,
+h3.subsection-title {
+  margin: 1.2em 0 0.6em;
+  font-family: var(--abf-font-title, serif);
+  font-size: var(--abf-size-h3, 1.1em);
+  font-weight: 600;
+  text-indent: 0;
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+/* ---------------------------------------------------------------------------
+   四、扉页（独立 XHTML，paper 底 + 朱红细框）
+   --------------------------------------------------------------------------- */
+section.title-page {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  break-after: page;
+  page-break-after: always;
+}
+
+.title-page .tp-inner {
+  margin: 2.2em auto 0;
+  padding: 2.6em 1.6em;
+  max-width: 22em;
+  background: var(--abf-card, #F4F1EA);
+  border: 1px solid var(--abf-rule, #DCD8CE);
+}
+
+.title-page .tp-ornament {
+  margin: 0 0 1.4em;
+  color: var(--abf-vermilion, #A8332B);
+  font-size: 0.8em;
+  letter-spacing: 0.6em;
+  text-indent: 0.6em;
+}
+
+.title-page h1.tp-title {
+  margin: 0 0 0.9em;
+  color: var(--abf-ink, #1F2220);
+  font-family: var(--abf-font-title, serif);
+  font-size: 2.05em;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.12em;
+  text-indent: 0;
+}
+
+.title-page .tp-rule {
+  width: 4.6em;
+  height: 0;
+  margin: 0 auto 1.3em;
+  border: 0;
+  border-top: 1px solid var(--abf-vermilion, #A8332B);
+  background: transparent;
+}
+
+.title-page .tp-sub {
+  margin: 0 0 1.6em;
+  color: var(--abf-ink-soft, #4A4E48);
+  font-family: var(--abf-font-quote, serif);
+  font-size: 0.98em;
+  line-height: 1.7;
+  text-indent: 0;
+}
+
+.title-page .tp-author {
+  margin: 1.8em 0 0.4em;
+  color: var(--abf-ink, #1F2220);
+  font-family: var(--abf-font-title, serif);
+  font-size: 1.06em;
+  letter-spacing: 0.22em;
+  text-indent: 0;
+}
+
+.title-page .tp-imprint {
+  margin: 2.6em 0 0;
+  color: var(--abf-muted, #8C8F86);
+  font-family: var(--abf-font-ui, sans-serif);
+  font-size: 0.72em;
+  letter-spacing: 0.14em;
+  text-indent: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   五、纹样
+   --------------------------------------------------------------------------- */
+
+/* 逻辑页纹样：按内容分段插入，滚动阅读时形成页面节奏 */
+.page-rule {
+  margin: 1.5em 0 1.7em;
+  color: var(--abf-vermilion, #A8332B);
+  font-size: var(--abf-ornament-size, 0.78em);
+  letter-spacing: 0.45em;
+  text-indent: 0.45em;
+  text-align: center;
+  line-height: 1;
+  opacity: 0.75;
+}
+
+/* 章间分隔 */
+.section-break {
+  margin: 2em auto;
+  width: 40%;
+  text-align: center;
+  color: var(--abf-rule-strong, #C4BEB0);
+  letter-spacing: 0.6em;
+  text-indent: 0.6em;
+  font-size: 0.72em;
+}
+
+/* ---------------------------------------------------------------------------
+   六、引文
+   --------------------------------------------------------------------------- */
+blockquote {
+  margin: 1.35em 1.1em;
+  padding: 0.15em 0 0.15em 1em;
+  border-left: 3px solid var(--abf-vermilion, #A8332B);
+  background: transparent;
+  color: var(--abf-ink-soft, #4A4E48);
+  font-family: var(--abf-font-quote, serif);
+  font-size: var(--abf-size-quote, 0.95em);
+  line-height: var(--abf-lh-quote, 1.75);
+  text-indent: 0;
+}
+
+blockquote cite {
+  display: block;
+  margin-top: 0.5em;
+  color: var(--abf-muted, #8C8F86);
+  font-size: 0.86em;
+  text-align: right;
+  text-indent: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   七、注号与注释区
+   --------------------------------------------------------------------------- */
+a.noteref {
+  color: var(--abf-vermilion, #A8332B);
+  font-size: 0.72em;
+  line-height: 0;
+  text-decoration: none;
+  vertical-align: super;
+}
+
+section.footnotes {
+  margin-top: 2.4em;
+  padding-top: 1.1em;
+  border-top: 1px solid var(--abf-rule, #DCD8CE);
+}
+
+section.footnotes h2,
+section.footnotes .fn-head {
+  margin: 0 0 0.9em;
+  font-family: var(--abf-font-title, serif);
+  font-size: 0.95em;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-align: left;
+  text-indent: 0;
+  color: var(--abf-ink-soft, #4A4E48);
+}
+
+section.footnotes h2::before {
+  content: none;
+}
+
+section.footnotes ol {
+  margin: 0;
+  padding-left: 1.4em;
+}
+
+section.footnotes li,
+li.footnote {
+  margin: 0 0 0.5em;
+  font-family: var(--abf-font-note, serif);
+  font-size: var(--abf-size-note, 0.86em);
+  line-height: 1.65;
+  color: var(--abf-ink-soft, #4A4E48);
+  text-indent: 0;
+}
+
+li.footnote p {
+  text-indent: 0;
+  margin: 0;
+}
+
+a.footnote-back {
+  color: var(--abf-muted, #8C8F86);
+  text-decoration: none;
+  font-size: 0.9em;
+}
+
+/* ---------------------------------------------------------------------------
+   八、图片与图注
+   --------------------------------------------------------------------------- */
+figure {
+  margin: 1.5em 0;
+}
+
+figure svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+
+figure img {
+  border-radius: var(--abf-figure-radius, 2px);
+}
+
+figcaption {
+  margin-top: 0.6em;
+  color: var(--abf-muted, #8C8F86);
+  font-family: var(--abf-font-note, serif);
+  font-size: var(--abf-size-caption, 0.84em);
+  line-height: 1.55;
+  text-align: center;
+  text-indent: 0;
+}
+
+figcaption::before {
+  content: "\2014\A0";
+  color: var(--abf-rule-strong, #C4BEB0);
+}
+
+/* ---------------------------------------------------------------------------
+   九、竖排（可选；Apple Books 支持良好，Kindle 与多数国产 App 忽略）
+   --------------------------------------------------------------------------- */
+.abf-vertical {
+  writing-mode: vertical-rl;
+  -webkit-writing-mode: vertical-rl;
+  text-orientation: upright;
+}
+
+.abf-vertical h1.chapter-title::before,
+.abf-vertical h1.chapter-title::after {
+  display: none;
+}
+
+.abf-vertical p {
+  text-indent: 1em;
+  margin: 0 0 0 0.4em;
+}

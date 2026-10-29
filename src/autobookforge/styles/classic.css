@@ -1,0 +1,70 @@
+/* =====================================================================
+   AutoBookForge -- classic.css  古籍风格
+   仿宋正文、宽行高、暖调墨色、〇 形章题装饰。适合影印感古籍。
+   默认正文字体：朱雀仿宋（可覆盖）。
+
+   正文不设底色：仿古纸色改由扉页卡片承载，避免与阅读器深色主题冲突。
+   ===================================================================== */
+
+body {
+  font-family: var(--abf-font-quote, "STFangsong", "FangSong",
+    "Noto Serif CJK SC", "Songti SC", serif);
+  line-height: 1.92;
+  color: var(--abf-ink, #2a2620);
+  letter-spacing: 0.03em;
+}
+
+p {
+  margin: 0 0 0.42em;
+}
+
+h1 {
+  margin: 1.9em 0 1.6em;
+  font-size: 1.46em;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  color: var(--abf-vermilion, #A8332B);
+}
+
+h1::before,
+h1::after {
+  content: "\3007";
+  display: inline;
+  width: auto;
+  height: auto;
+  margin: 0 0.6em;
+  color: var(--abf-rule-strong, #C4BEB0);
+  font-size: 0.5em;
+  border: 0;
+  vertical-align: middle;
+}
+
+h2, h3 {
+  letter-spacing: 0.12em;
+  color: var(--abf-ink-soft, #5a4a2c);
+}
+
+h2::before {
+  content: "\2014\A0";
+  color: var(--abf-vermilion, #A8332B);
+}
+
+blockquote {
+  border-left-color: var(--abf-rule-strong, #C4BEB0);
+  color: var(--abf-ink-soft, #5c5344);
+}
+
+hr {
+  width: 50%;
+  border-top-color: var(--abf-rule, #D8CBA8);
+}
+
+.volume-title {
+  color: var(--abf-vermilion, #A8332B);
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  border-top: 0;
+  border-bottom: 0;
+}

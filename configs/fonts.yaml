@@ -1,0 +1,196 @@
+# AutoBookForge 字体配置
+# ---------------------------------------------------------------
+# 字体资源全部位于项目根的 ttf/ 目录。扫描器会自动发现新放入的
+# .ttf / .otf 文件并读取其 name 表得到家族名，**新增字体无需改代码**。
+# 本文件只做三件事：给稳定 id、给显示标签、定角色映射。
+#
+# 授权：本项目随附字体均为 SIL OFL 1.1，允许嵌入与再分发。
+# 子集化不改名、只裁剪字形，符合 OFL 对保留字体名的要求。
+
+# ---- 扫描规则 ----
+discovery:
+  roots:
+    - ttf
+  # 忽略的目录名（macOS 压缩包残留）
+  ignore_dirs:
+    - __MACOSX
+  # 忽略的文件名前缀（macOS 资源分叉文件）
+  ignore_prefixes:
+    - "._"
+  extensions:
+    - .ttf
+    - .otf
+    - .ttc
+
+# ---- 稳定 id 登记（按相对 ttf/ 的路径匹配；未登记者自动发现）----
+fonts:
+  # ============ 宋体系（正文首选）============
+  - id: source-han-serif
+    file: source-han-serif/SourceHanSerifCN-Regular.otf
+    label: 思源宋体
+    family: "Source Han Serif CN"
+    style: normal
+    weight: 400
+    role: body
+    note: 传统宋体，横细竖粗、起收笔有装饰，书卷气最足
+
+  - id: source-han-serif-bold
+    file: source-han-serif/SourceHanSerifCN-Bold.otf
+    label: 思源宋体 粗
+    family: "Source Han Serif CN"
+    style: normal
+    weight: 700
+    role: title
+    note: 思源宋体同族粗体，章题首选
+
+  - id: source-han-serif-semibold
+    file: source-han-serif/SourceHanSerifCN-SemiBold.otf
+    label: 思源宋体 半粗
+    family: "Source Han Serif CN"
+    style: normal
+    weight: 600
+    note: 中度字重，副标题与卷题可用
+
+  - id: lxgw-neo-zhisong
+    file: lxgw-neo-zhisong/LXGWNeoZhiSong.ttf
+    label: 霞鹜新致宋
+    family: "LXGW Neo ZhiSong"
+    style: normal
+    weight: 400
+    role: body
+    note: 开源宋体，笔画柔和开阔，适合长篇正文
+
+  # ============ 黑宋（标题备选）============
+  - id: chill-duan-hei-song
+    file: ChillDuanHeiSongPro_v1.2/寒蝉端黑宋Pro v1.2/ChillDuanHeiSongPro_Regular.otf
+    label: 寒蝉端黑宋 Pro
+    family: "寒蟬端黑宋Pro"
+    style: normal
+    weight: 400
+    role: title
+    note: 黑宋，笔端有装饰、粗细对比克制，适合章题与书名
+
+  - id: chill-duan-hei-song-jp
+    file: ChillDuanHeiSongPro_v1.2/寒蝉端黑宋Pro v1.2/ChillDuanHeiSongProJP_Regular.otf
+    label: 寒蝉端黑宋 Pro JP
+    family: "寒蝉端黑宋Pro"
+    style: normal
+    weight: 400
+    role: unused
+    note: 日文字形子集，汉字缺字多，不用于中文正文
+
+  # ============ 楷体系（文艺风格）============
+  - id: lxgw-wenkai
+    file: lxgw-wenkai-v1.522/LXGWWenKai-Regular.ttf
+    label: 霞鹜文楷
+    family: "LXGW WenKai"
+    style: normal
+    weight: 400
+    role: body
+    note: 楷体，手写温度，适合小说与散文
+
+  - id: lxgw-wenkai-light
+    file: lxgw-wenkai-v1.522/LXGWWenKai-Light.ttf
+    label: 霞鹜文楷 细
+    family: "LXGW WenKai"
+    style: normal
+    weight: 300
+    role: unused
+    note: 同族细字重
+
+  - id: lxgw-wenkai-medium
+    file: lxgw-wenkai-v1.522/LXGWWenKai-Medium.ttf
+    label: 霞鹜文楷 中
+    family: "LXGW WenKai"
+    style: normal
+    weight: 500
+    role: unused
+    note: 同族中字重
+
+  # ============ 等宽楷（诗歌/代码）============
+  - id: lxgw-wenkai-mono
+    file: lxgw-wenkai-v1.522/LXGWWenKaiMono-Regular.ttf
+    label: 霞鹜文楷等宽
+    family: "LXGW WenKai Mono"
+    style: normal
+    weight: 400
+    role: unused
+    note: 等宽楷，适合诗歌与表格
+
+  - id: lxgw-wenkai-mono-light
+    file: lxgw-wenkai-v1.522/LXGWWenKaiMono-Light.ttf
+    label: 霞鹜文楷等宽 细
+    family: "LXGW WenKai Mono"
+    style: normal
+    weight: 300
+    role: unused
+
+  - id: lxgw-wenkai-mono-medium
+    file: lxgw-wenkai-v1.522/LXGWWenKaiMono-Medium.ttf
+    label: 霞鹜文楷等宽 中
+    family: "LXGW WenKai Mono"
+    style: normal
+    weight: 500
+    role: unused
+
+  # ============ 仿宋（引文/注文）============
+  - id: zhuque-fangsong
+    file: ZhuqueFangsong-v0.212/ZhuqueFangsong-Regular.ttf
+    label: 朱雀仿宋
+    family: "Zhuque Fangsong"
+    style: normal
+    weight: 400
+    role: quote
+    note: 仿宋，清瘦疏朗，适合引文与注文
+
+# ---- 风格默认字体 ----
+# 每种排版风格的默认角色字体；用户显式指定优先。null 表示「不嵌入，走系统回退」。
+style_defaults:
+  minimal:
+    body: null          # 系统中性无衬线，不嵌字体
+    title: null
+  business:
+    body: null
+    title: null
+  literary:
+    body: lxgw-wenkai
+    title: source-han-serif-bold
+    quote: zhuque-fangsong
+    note: lxgw-wenkai
+  classic:
+    body: zhuque-fangsong
+    title: source-han-serif-bold
+    quote: zhuque-fangsong
+    note: zhuque-fangsong
+  guoxue:
+    body: source-han-serif
+    title: source-han-serif-bold
+    quote: zhuque-fangsong
+    note: zhuque-fangsong
+
+# ---- 角色默认映射 ----
+# body 正文 / title 章题书名 / quote 引文 / note 注文
+# 置空表示「不指定，走系统回退链」
+roles:
+  body: source-han-serif
+  title: chill-duan-hei-song
+  quote: zhuque-fangsong
+  note: zhuque-fangsong
+
+# ---- 嵌入策略 ----
+embed:
+  # 档位：none 不嵌 | body 正文字体 | body+title 正文+标题 | full 全部角色
+  level: body
+  # 格式：woff2 体积最优 | ttf 兼容最广（老 Kindle） | both 双 src 回退
+  format: woff2
+  # 是否按本书字符集子集化（强烈建议开启）
+  subset: true
+  # 嵌入总体积上限（MB），超过自动降级档位
+  max_size_mb: 3.0
+
+# ---- 回退链（内嵌字体不可用时使用）----
+fallbacks:
+  serif: "Noto Serif CJK SC, Source Han Serif SC, Songti SC, SimSun, STSong, serif"
+  sans: "Noto Sans CJK SC, PingFang SC, Microsoft YaHei, Heiti SC, sans-serif"
+  kai: "Kaiti SC, STKaiti, KaiTi, Noto Serif CJK SC, serif"
+  fangsong: "STFangsong, FangSong, Noto Serif CJK SC, serif"

@@ -1,0 +1,60 @@
+# =====================================================================
+# LLM 增强层配置（默认模板）
+# ---------------------------------------------------------------------
+# API 地址、API Key、模型名称由用户自行填写。两种填写方式：
+#   1. 推荐：启动 Web UI（autobookforge serve）后，在右侧「LLM 增强 → 模型与任务设置」
+#      中填写并保存，设置写入 configs/llm.local.json（仅本机，勿提交）。
+#   2. 直接修改本文件；或用环境变量覆盖（优先级最高）：
+#      ABF_LLM_ENABLED / ABF_LLM_BASE_URL / ABF_LLM_API_KEY / ABF_LLM_MODEL /
+#      ABF_LLM_BUDGET / ABF_LLM_TEMPERATURE / ABF_LLM_TIMEOUT / ABF_LLM_MAX_TOKENS
+# 本文件不含密钥，可安全提交。
+#
+# LLM 是可选增强层：未填写密钥时整层静默跳过，流水线仍以纯本地 CPU 完成
+# 清洗、分章、双层纠错、精排与打包，零 API 成本的基础能力不受影响。
+# =====================================================================
+
+llm:
+  enabled: false                 # 总开关；未配置密钥时即使为 true 也会自动跳过
+
+  # -- 服务端点（由用户填写）--
+  base_url: "https://api.openai.com/v1"
+  api_key: ""                    # 留空表示未配置；也可用环境变量 ABF_LLM_API_KEY
+  model: "gpt-4o-mini"
+
+  # -- 生成参数 --
+  temperature: 0.3               # 校对类任务内部会进一步压低到 0.0 - 0.1
+  max_tokens: 2048
+  timeout: 60
+  retries: 2
+  concurrency: 4
+
+  # -- 降本开关 --
+  budget: "standard"             # economy（经济）/ standard（标准）/ fine（精细）
+  json_mode: true                # 结构化输出：请求 response_format=json_object
+  prefix_cache: true             # 固定 system 前缀以命中服务端前缀缓存
+  use_cache: true                # 本地结果缓存，同一输入不重复计费
+
+  # -- 七项任务开关 --
+  tasks:
+    chapter_titles: true         # 一、生成章节名（含空白章节补全）
+    blank_titles: true           # 一（续）、空白章节名补全
+    cover_params: true           # 二、个性化封面（输出程序化设计参数，本地渲染）
+    proofread: true              # 三、精准校对（已覆盖第六、七项能力）
+    ad_filter: true              # 四、去广告（规则前置，仅可疑行送检）
+    toc: false                   # 五、生成目录（默认关闭，章节识别已直接产出目录）
+    spelling: false              # 六、错别字单独修正（仅在关闭 proofread 时生效）
+    grammar: false               # 七、语句通顺性单独修正（仅在关闭 proofread 时生效）
+
+  # -- Token 预算档位（改 budget 一项即可，此处为口径说明）--
+  # economy  : 分块 500 字，每次批量 10 块，重叠 10%   适合网文与通俗小说
+  # standard : 分块 300 字，每次批量  5 块，重叠 15%   适合一般文学作品
+  # fine     : 分块 200 字，每次批量  3 块，重叠 20%   适合严肃文学与学术文本
+
+  # -- 常见服务端点预设（复制到上面三项即可）--
+  # OpenAI     : https://api.openai.com/v1                          gpt-4o-mini
+  # DeepSeek   : https://api.deepseek.com/v1                        deepseek-chat
+  # 通义千问    : https://dashscope.aliyuncs.com/compatible-mode/v1  qwen-plus
+  # Kimi       : https://api.moonshot.cn/v1                         moonshot-v1-8k
+  # 智谱 GLM   : https://open.bigmodel.cn/api/paas/v4               glm-4-flash
+  # 本地 vLLM  : http://127.0.0.1:8001/v1                           <模型名>
+  # Ollama     : http://127.0.0.1:11434/v1                          qwen2.5:7b

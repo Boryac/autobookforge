@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AutoBookForge — TXT 精排电子书生产引擎</title>
+<link rel="icon" href="logo.jpg">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="scene">
+  <main class="app" id="app">
+
+    <!-- ================= 左：主工作区 ================= -->
+    <section class="main">
+      <i class="grain" aria-hidden="true"></i>
+
+      <header class="brand">
+        <img class="logo" src="logo.jpg" alt="AutoBookForge">
+        <div class="brand-text">
+          <b>AutoBookForge</b>
+          <span>TXT 精排电子书生产引擎</span>
+        </div>
+        <span class="tagline">零 API 成本 · 纯本地 CPU</span>
+      </header>
+
+      <h1 class="heading">把杂乱的 TXT<br>变成精排电子书</h1>
+
+      <!-- 步骤视图：上传 -->
+      <div class="stage-view" id="viewUpload">
+        <div class="dropzone glass" id="dropzone" role="button" tabindex="0" aria-label="上传 TXT 文件">
+          <svg class="dz-icon" viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M24 32V12M24 12l-8 8M24 12l8 8"/>
+            <path d="M8 30v6a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4v-6"/>
+          </svg>
+          <b>拖拽 TXT 文件到此处</b>
+          <span>或点击选择文件　支持 UTF-8 / GBK / GB18030 / BIG5 自动识别</span>
+          <input type="file" id="fileInput" accept=".txt,.text" hidden>
+        </div>
+
+        <div class="quick-row">
+          <button class="chip" id="btnDemo">载入示例文本</button>
+          <button class="chip" id="btnPaste">粘贴文本纠错</button>
+        </div>
+
+        <div class="hint-line" id="uploadHint">尚未选择文件</div>
+      </div>
+
+      <!-- 步骤视图：结果 -->
+      <div class="stage-view hidden" id="viewResult">
+        <div class="tabs" role="tablist">
+          <button class="tab on" data-tab="chapters" role="tab">章节预览</button>
+          <button class="tab" data-tab="diff" role="tab">纠错对比</button>
+          <button class="tab" data-tab="cover" role="tab">封面成品</button>
+          <button class="tab" data-tab="files" role="tab">产出文件</button>
+          <button class="tab" id="tabLlm" data-tab="llm" role="tab" hidden>LLM 增强</button>
+        </div>
+
+        <div class="panel" id="panelChapters">
+          <div class="panel-head">
+            <div class="book-meta">
+              <b id="metaTitle">—</b>
+              <span id="metaAuthor">—</span>
+            </div>
+            <span class="pill" id="metaChars">0 字</span>
+          </div>
+          <ul class="chapter-list" id="chapterList"></ul>
+        </div>
+
+        <div class="panel hidden" id="panelDiff">
+          <div class="panel-head">
+            <div class="book-meta">
+              <b>纠错对比</b>
+              <span>左右分栏 · 逐条标注来源层级</span>
+            </div>
+            <div class="diff-legend">
+              <span class="lg lg-rule">规则层</span>
+              <span class="lg lg-ngram">统计层</span>
+            </div>
+          </div>
+          <div class="diff-wrap">
+            <div class="diff-col">
+              <div class="diff-col-title">原始文本</div>
+              <div class="diff-body" id="diffOriginal"></div>
+            </div>
+            <div class="diff-col">
+              <div class="diff-col-title">纠错结果</div>
+              <div class="diff-body" id="diffCorrected"></div>
+            </div>
+          </div>
+          <div class="diff-foot">
+            <span id="diffSummary">尚无修正</span>
+            <div class="diff-actions">
+              <button class="chip" id="btnReportJson">导出 JSON 报告</button>
+              <button class="chip" id="btnReportMd">导出 Markdown 报告</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel hidden" id="panelCover">
+          <div class="cover-preview">
+            <img id="coverImg" alt="封面预览">
+          </div>
+        </div>
+
+        <div class="panel hidden" id="panelFiles">
+          <ul class="file-list" id="fileList"></ul>
+        </div>
+
+        <div class="panel hidden" id="panelLlm">
+          <div class="panel-head">
+            <div class="book-meta">
+              <b>大模型增强</b>
+              <span id="llmReportMeta">本次未启用</span>
+            </div>
+            <span class="pill" id="llmReportTokens">0 token</span>
+          </div>
+          <div class="llm-block">
+            <div class="llm-block-title">任务明细</div>
+            <table class="cost-table" id="llmTaskTable"></table>
+          </div>
+          <div class="llm-block">
+            <div class="llm-block-title">降本核算</div>
+            <table class="cost-table" id="llmCostTable"></table>
+            <div class="llm-note" id="llmCostNote"></div>
+          </div>
+          <div class="llm-block">
+            <div class="llm-block-title">运行提示</div>
+            <ul class="llm-notes" id="llmNotes"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 进度 -->
+      <div class="progress-bar-wrap" id="progressWrap">
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-label">
+          <span id="progressStage">就绪</span>
+          <span id="progressPct">0%</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 右：控制栏 ================= -->
+    <aside class="side">
+      <i class="grain" aria-hidden="true"></i>
+
+      <div class="side-scroll">
+
+      <!-- 步骤导航 -->
+      <div class="tile tile-steps">
+        <div class="tile-label">处理流程</div>
+        <ol class="steps" id="steps">
+          <li data-step="upload"><i class="dot"></i><span>上传 TXT</span></li>
+          <li data-step="preview"><i class="dot"></i><span>章节预览</span></li>
+          <li data-step="correct"><i class="dot"></i><span>智能纠错</span></li>
+          <li data-step="typeset"><i class="dot"></i><span>精排样式</span></li>
+          <li data-step="cover"><i class="dot"></i><span>封面生成</span></li>
+          <li data-step="export"><i class="dot"></i><span>导出电子书</span></li>
+        </ol>
+      </div>
+
+      <!-- 快速设置 -->
+      <div class="tile tile-settings">
+        <div class="tile-label">快速设置</div>
+        <label class="field">
+          <span>书名</span>
+          <input id="inpTitle" type="text" placeholder="自动检测">
+        </label>
+        <label class="field">
+          <span>作者</span>
+          <input id="inpAuthor" type="text" placeholder="自动提取">
+        </label>
+
+        <div class="field">
+          <span>排版风格</span>
+          <div class="seg seg-wrap" id="segStyle">
+            <button data-value="minimal">简约</button>
+            <button data-value="literary" class="on">文艺</button>
+            <button data-value="business">商务</button>
+            <button data-value="classic">古籍</button>
+            <button data-value="guoxue">国学</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <span>纠错强度</span>
+          <div class="seg" id="segCorrect">
+            <button data-value="1">仅规则</button>
+            <button data-value="2" class="on">规则 + 统计</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <span>输出格式</span>
+          <div class="checks" id="chkFormats">
+            <label><input type="checkbox" value="epub" checked><i></i>EPUB</label>
+            <label><input type="checkbox" value="mobi"><i></i>MOBI</label>
+            <label><input type="checkbox" value="azw3"><i></i>AZW3</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <span>封面</span>
+          <div class="seg" id="segCover">
+            <button data-value="on" class="on">生成</button>
+            <button data-value="off">跳过</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <span>内嵌字体</span>
+          <div class="seg seg-wrap" id="segFontEmbed">
+            <button data-value="none">不嵌入</button>
+            <button data-value="body" class="on">正文</button>
+            <button data-value="body+title">正文+标题</button>
+            <button data-value="full">全部角色</button>
+          </div>
+        </div>
+
+        <label class="field">
+          <span>字体格式</span>
+          <select id="selFontFormat">
+            <option value="woff2">woff2　体积最优</option>
+            <option value="ttf">ttf　兼容老 Kindle</option>
+            <option value="both">both　双份回退</option>
+          </select>
+        </label>
+
+        <div class="field-row">
+          <label class="field">
+            <span>正文字体</span>
+            <select id="selFontBody"></select>
+          </label>
+
+          <label class="field">
+            <span>章题字体</span>
+            <select id="selFontTitle"></select>
+          </label>
+        </div>
+        <p class="setting-hint" id="hintFont">字体来自项目 ttf/ 目录，按本书用字子集化后嵌入</p>
+
+        <div class="field">
+          <span>首行缩进</span>
+          <div class="seg seg-wrap" id="segIndent">
+            <button data-value="space" class="on">全角空格</button>
+            <button data-value="css">CSS 2em</button>
+            <button data-value="spacing">段间距</button>
+          </div>
+          <p class="hint" id="hintIndent">全角空格：所有阅读器一致，但不随字号缩放</p>
+        </div>
+
+        <div class="field">
+          <span>章首纹样</span>
+          <div class="seg seg-wrap" id="segOrnament">
+            <button data-value="none">无</button>
+            <button data-value="chapter" class="on">章首</button>
+            <button data-value="segment">逻辑页</button>
+          </div>
+          <p class="hint" id="hintOrnament">每章开头一个装饰符号</p>
+        </div>
+
+        <div class="field">
+          <span>版面</span>
+          <div class="checks" id="chkLayout">
+            <label><input type="checkbox" id="chkTitlePage" checked><i></i>扉页</label>
+            <label><input type="checkbox" id="chkVertical"><i></i>竖排</label>
+          </div>
+          <p class="hint">竖排仅 Apple Books 等少数阅读器支持良好</p>
+        </div>
+
+        <div class="action-bar">
+          <button class="btn-primary" id="btnStart">开始处理</button>
+          <button class="chip chip-block" id="btnReset">重新选择文件</button>
+        </div>
+      </div>
+
+      <!-- LLM 增强 -->
+      <div class="tile tile-llm">
+        <div class="tile-label">LLM 增强 <span class="llm-state" id="llmState">未配置</span></div>
+        <button class="switch switch-row" id="llmToggle" role="switch" aria-checked="false">
+          <i></i><span>启用大模型增强</span>
+        </button>
+        <div class="field">
+          <span>Token 预算档位</span>
+          <div class="seg" id="segBudget">
+            <button data-value="economy">经济</button>
+            <button data-value="standard" class="on">标准</button>
+            <button data-value="fine">精细</button>
+          </div>
+        </div>
+        <div class="llm-meta" id="llmMeta">未填写 API 地址与密钥</div>
+        <button class="chip chip-block" id="btnLlmSettings">模型与任务设置</button>
+      </div>
+
+      <!-- 统计磁贴 -->
+      <div class="tile tile-stats">
+        <div class="tile-label">处理统计</div>
+        <div class="stat-grid">
+          <div class="stat"><b id="stChapters">0</b><span>章节</span></div>
+          <div class="stat"><b id="stRule">0</b><span>规则修正</span></div>
+          <div class="stat"><b id="stNgram">0</b><span>统计修正</span></div>
+          <div class="stat"><b id="stTime">0.0</b><span>耗时(秒)</span></div>
+        </div>
+        <div class="meta-line" id="metaLine" hidden></div>
+        <div class="stat-grid" id="structGrid" hidden>
+          <div class="stat"><b id="stVolumes">0</b><span>卷</span></div>
+          <div class="stat"><b id="stSections">0</b><span>节</span></div>
+          <div class="stat"><b id="stMedian">0</b><span>中位章长</span></div>
+          <div class="stat"><b id="stCoverage">0%</b><span>覆盖率</span></div>
+        </div>
+        <div class="meta-line" id="cleanLine" hidden></div>
+        <div class="status-line">
+          <i class="live-dot" id="liveDot"></i>
+          <span id="statusText">等待任务</span>
+        </div>
+      </div>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- LLM 设置弹层 -->
+<div class="modal" id="llmModal" hidden>
+  <div class="modal-scrim" data-close></div>
+  <div class="modal-card glass">
+    <i class="grain" aria-hidden="true"></i>
+    <header class="modal-head">
+      <div class="modal-title">
+        <b>大模型设置</b>
+        <span>API 地址、密钥与模型名由你填写，仅保存在本机配置文件</span>
+      </div>
+      <button class="icon-btn" data-close aria-label="关闭">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </header>
+    <div class="modal-body">
+      <div class="form-grid">
+        <label class="field wide"><span>API 地址</span><input id="inpBaseUrl" type="text" placeholder="https://api.openai.com/v1"></label>
+        <label class="field wide"><span>API Key</span><input id="inpApiKey" type="password" placeholder="sk-xxxx　留空表示不修改已保存的密钥"></label>
+        <label class="field wide"><span>模型名称</span><input id="inpModel" type="text" list="modelOptions" placeholder="gpt-4o-mini"><datalist id="modelOptions"></datalist></label>
+        <label class="field"><span>温度</span><input id="inpTemp" type="number" step="0.1" min="0" max="2" value="0.3"></label>
+        <label class="field"><span>最大输出</span><input id="inpMaxTokens" type="number" min="64" max="32000" value="2048"></label>
+        <label class="field"><span>超时(秒)</span><input id="inpTimeout" type="number" min="5" max="600" value="60"></label>
+        <label class="field"><span>重试次数</span><input id="inpRetries" type="number" min="0" max="8" value="2"></label>
+        <label class="field wide"><span>思考模式（推理型模型）</span><select id="selThinking"></select></label>
+      </div>
+      <div class="llm-note" id="thinkingHint"></div>
+      <div class="toggle-row">
+        <label class="check"><input type="checkbox" id="chkJsonMode" checked><i></i>结构化输出</label>
+        <label class="check"><input type="checkbox" id="chkPrefix" checked><i></i>前缀缓存</label>
+        <label class="check"><input type="checkbox" id="chkLocalCache" checked><i></i>本地结果缓存</label>
+      </div>
+      <div class="llm-block-title">任务开关</div>
+      <div class="task-grid" id="llmTaskGrid"></div>
+      <div class="llm-block-title">降本机制</div>
+      <div class="strategy-grid" id="llmStrategyGrid"></div>
+      <div class="test-result" id="llmTestResult" hidden></div>
+    </div>
+    <footer class="modal-foot">
+      <span class="modal-path" id="llmSavedPath"></span>
+      <button class="chip" id="btnTestLlm">测试连通性</button>
+      <button class="chip" id="btnFetchModels">拉取模型</button>
+      <button class="btn-primary" id="btnSaveLlm">保存</button>
+    </footer>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

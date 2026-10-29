@@ -1,0 +1,50 @@
+{
+  "llm": {
+    "enabled": true,
+    "base_url": "http://127.0.0.1:8326/v1",
+    "api_key": "o0TvZHj043uUqs39sBbMuJ5z9KVOSvRrlXRGtDjH01c",
+    "model": "cline/cline-free/solar-mini4",
+    "temperature": 0.8,
+    "max_tokens": 16384,
+    "timeout": 180,
+    "retries": 5,
+    "concurrency": 4,
+    "budget": "fine",
+    "json_mode": true,
+    "prefix_cache": true,
+    "use_cache": true,
+    "tasks": {
+      "chapter_titles": true,
+      "blank_titles": true,
+      "cover_params": true,
+      "proofread": true,
+      "ad_filter": true,
+      "toc": true,
+      "spelling": true,
+      "grammar": true
+    }
+  },
+  "enabled": true,
+  "base_url": "http://127.0.0.1:8326/v1",
+  "api_key": "o0TvZHj043uUqs39sBbMuJ5z9KVOSvRrlXRGtDjH01c",
+  "model": "cline/cline-free/solar-mini4",
+  "temperature": 0.8,
+  "max_tokens": 16384,
+  "timeout": 180,
+  "retries": 5,
+  "concurrency": 4,
+  "budget": "fine",
+  "json_mode": true,
+  "prefix_cache": true,
+  "use_cache": true,
+  "tasks": {
+    "chapter_titles": true,
+    "blank_titles": true,
+    "cover_params": true,
+    "proofread": true,
+    "ad_filter": true,
+    "toc": true,
+    "spelling": true,
+    "grammar": true
+  }
+}

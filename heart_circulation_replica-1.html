@@ -1,0 +1,1688 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neka — 心脏与循环</title>
+<style>
+:root{--ink:#202220;--muted:#a4a59e;--lime:#e0f247;--paper:#fbfbf9;--glass-tint:rgba(255,255,255,.26);--glass-edge:rgba(255,255,255,.62);--noise:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='.42'/></svg>");--halftone:radial-gradient(circle at 50% 50%,rgba(56,62,50,.5) 0 .45px,rgba(56,62,50,0) 1.05px)}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{font-family:Inter,"Helvetica Neue",Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC","WenQuanYi Micro Hei",sans-serif;background:var(--paper);color:var(--ink)}
+.scene{position:relative;width:100vw;height:100vh;min-height:440px;overflow:hidden;background:var(--paper);isolation:isolate}
+.screen{position:relative;width:100%;height:100%;overflow:hidden;background:linear-gradient(110deg,#fdfdfc,#fbfbf9);container-type:inline-size}
+.dashboard{position:absolute;inset:0;display:grid;grid-template-columns:52.7% 47.3%;padding:1.65% 1.25% 1.2% 1.75%;gap:.7%;background:linear-gradient(110deg,#fdfdfc,#fbfbf9)}
+.left{position:relative;min-width:0;min-height:0;overflow:hidden}
+.brand{position:absolute;left:1.5%;top:1.3%;display:flex;align-items:center;gap:9px;font-size:min(1.08vw,1.8vh);font-weight:550;letter-spacing:-.03em;color:#313330;height:2.8%}
+.langtog{margin-left:min(0.45vw,0.75vh);display:inline-flex;align-items:stretch;border:1px solid #e6e6e1;border-radius:99px;background:#f5f5f2;overflow:hidden;font-size:min(0.68vw,1.133vh);letter-spacing:.06em;line-height:1}
+.langtog button{border:0;background:transparent;color:#9a9d93;font-family:inherit;font-size:inherit;font-weight:550;letter-spacing:.04em;padding:.55em .72em;min-width:2.6em;cursor:pointer;transition:background .22s ease,color .22s ease}
+.langtog button:hover{background:rgba(255,255,255,.85);color:#3d4138}
+.langtog button.on{background:#e4e6de;color:#2f322b}
+.langtog button:focus-visible{outline:2px solid #e0f247;outline-offset:-2px}
+.sunmark{width:min(2.45vw,4.083vh);height:min(2.45vw,4.083vh);display:grid;place-items:center;background:#f0f0ed;color:#a9aaa5;font-size:min(1.55vw,2.583vh);line-height:1;font-family:Arial,sans-serif}
+.heading{position:absolute;top:10%;left:1.2%;z-index:3;font-size:min(2.92vw,4.867vh);line-height:.99;font-weight:440;letter-spacing:-.075em;color:#202321}
+.quick{position:absolute;left:1.3%;top:34.5%;z-index:4;display:flex;flex-direction:column;background:#f2f2ef;border:1px solid #ebebe7;border-radius:2px;overflow:hidden}
+.quick span{width:min(3.25vw,5.417vh);height:min(3.15vw,5.25vh);display:grid;place-items:center;color:#7d8078;border-bottom:1px solid #e4e4df;font-size:min(1.25vw,2.083vh)}
+.quick span:last-child{border-bottom:0}
+.quick svg{width:min(1.1vw,1.833vh);height:min(1.1vw,1.833vh);stroke:currentColor;fill:none;stroke-width:1.35}
+.person{position:absolute;left:16.2%;top:7%;width:63%;height:87%;z-index:1;opacity:.95;object-fit:cover;object-position:50% 20%;mix-blend-mode:multiply;filter:contrast(1.04) saturate(.88);-webkit-mask-image:radial-gradient(ellipse 59% 92% at 50% 43%,#000 46%,rgba(0,0,0,0) 100%);mask-image:radial-gradient(ellipse 59% 92% at 50% 43%,#000 46%,rgba(0,0,0,0) 100%)}
+.metrics{position:absolute;z-index:3;right:1.5%;top:17%;width:17.1%;display:grid;gap:4.2%}
+.mini{font-size:min(1.06vw,1.767vh);line-height:1.28;color:#30322f}
+.mini .symbol{width:min(3.7vw,6.167vh);height:min(3.7vw,6.167vh);margin-bottom:min(0.8vw,1.333vh);color:#d1d2cd;display:block}
+.mini b{display:block;font-size:min(1.03vw,1.717vh);font-weight:520;letter-spacing:-.025em;white-space:nowrap}
+.mini small{display:block;color:#a0a19a;font-size:min(0.9vw,1.5vh);margin-top:min(0.6vw,1vh)}
+.vitals{position:absolute;z-index:5;color:#202220;font-size:min(1.05vw,1.75vh)}
+.vitals strong{display:block;font-size:min(2.85vw,4.75vh);line-height:1;font-weight:480;letter-spacing:-.065em}
+.vitals small{display:block;font-size:min(1.04vw,1.733vh);color:#3f413d;margin-top:min(0.72vw,1.2vh);white-space:nowrap}
+.vitals em{font-style:normal;display:block;color:#92948c;font-size:min(0.89vw,1.483vh);margin-top:min(0.7vw,1.167vh)}
+.pressure{left:3.6%;top:70.4%}
+.pressure sup{font-size:min(1.35vw,2.25vh);color:#a5a69f;letter-spacing:-.03em;vertical-align:baseline;margin-left:min(0.2vw,0.333vh)}
+.sound{right:7.6%;top:57.8%;text-align:center}
+.sound strong{font-size:min(2.55vw,4.25vh)}
+.pulsepoint{position:absolute;width:min(0.65vw,1.083vh);height:min(0.65vw,1.083vh);border-radius:50%;background:var(--lime);z-index:5;box-shadow:0 0 0 min(0.7vw,1.167vh) rgba(224,242,71,.12)}
+.pp1{left:24.5%;top:78.2%}.pp2{left:71.7%;top:63.3%}
+.today{position:absolute;left:2.4%;right:0;bottom:1.2%;height:6.6%;display:flex;align-items:center;gap:1.15%;font-size:min(0.94vw,1.567vh);white-space:nowrap;color:#4b4d47;z-index:8}
+.today-label{margin-right:1.1%;font-size:min(0.99vw,1.65vh);letter-spacing:-.04em}
+.timeline{position:relative;height:73%;flex:0 0 47.5%;overflow:hidden;border-radius:1px;background:linear-gradient(100deg,#71994e,#95b96c 48%,#d5e8ab);color:#f9faee;display:flex;align-items:flex-end;justify-content:space-around;padding:0 .7% .55%;font-size:min(0.75vw,1.25vh);box-shadow:inset 0 0 0 1px #ffffff30}
+.timeline:before{content:"";position:absolute;left:0;right:0;top:21%;height:1px;background:#ffffff70}
+.timeline .band{position:absolute;top:11%;left:27%;width:12%;height:10%;background:#d9ef40;border-radius:1px;opacity:.92}
+.timeline .event{position:absolute;top:23%;width:min(0.45vw,0.75vh);height:min(0.45vw,0.75vh);border-radius:50%;background:#eff7c8}
+.timeline .event.e1{left:2%}.timeline .event.e2{left:47%}.timeline .event.e3{right:2%}
+.timeline .tick{position:absolute;top:21%;bottom:0;width:1px;background:#ffffff55}
+.timeline .t1{left:25%}.timeline .t2{left:50%}.timeline .t3{left:75%}
+.trailtime{font-size:min(0.78vw,1.3vh);align-self:flex-end;padding-bottom:.2%}
+.traildot{font-size:min(0.7vw,1.167vh);color:#b5b7b0;padding-bottom:.4%}
+.right{min-width:0;min-height:0;display:grid;grid-template-columns:1.04fr 1fr;grid-template-rows:29.2% 37.2% 31.4%;gap:.65%;height:100%;padding-top:.7%;padding-bottom:0}
+.tile{position:relative;min-width:0;min-height:0;overflow:hidden;color:#fff;padding:5.1% 6.2%;isolation:isolate}
+.label{position:relative;z-index:2;font-size:min(0.91vw,1.517vh);font-weight:430;line-height:1.2;color:rgba(255,255,255,.72);letter-spacing:-.015em}
+.tile h2{position:relative;z-index:2;margin:4.2% 0 0;font-size:min(3.05vw,5.083vh);font-weight:430;line-height:.95;letter-spacing:-.075em;color:rgba(255,255,255,.95)}
+.sub{position:relative;z-index:2;font-size:min(0.89vw,1.483vh);color:rgba(255,255,255,.68);margin-top:.6%}
+.corner{position:absolute;right:5.7%;top:5%;font-size:min(1.25vw,2.083vh);line-height:1;color:#ffffffb8;z-index:3;font-weight:300}
+.age{grid-column:1;grid-row:1/3;background:linear-gradient(150deg,#205d38 0%,#39834a 29%,#82ae6d 64%,#b9d28d 100%);padding:5.5% 7.2%}
+.age .label{font-size:min(0.88vw,1.467vh);color:#d9e7d0c9}.age .label span{float:right;color:#d7e5d0;font-size:min(0.84vw,1.4vh)}
+.age h2{font-size:min(4.3vw,7.167vh);margin-top:6.8%;font-weight:420}
+.age .sub{font-size:min(1.12vw,1.867vh);margin-top:1.2%;color:#e4efdb}.age .sub #ageDelta{float:right;font-size:min(1.48vw,2.467vh);line-height:1}.age .sub small{font-size:min(0.83vw,1.383vh);letter-spacing:0}
+.ageart{position:absolute;left:12%;top:30%;width:76%;height:54%;opacity:.77}
+.agefoot{position:absolute;left:14%;right:14%;bottom:5.2%;display:flex;align-items:flex-end;justify-content:space-between;color:#f0f5e2c4;font-size:min(0.88vw,1.467vh);text-align:center;line-height:1.35}
+.agefoot .dot{display:inline-block;width:min(0.45vw,0.75vh);height:min(0.45vw,0.75vh);background:#f4f8e6;border-radius:50%;margin-bottom:min(0.6vw,1vh)}
+.oxygen{grid-column:2;grid-row:1;background:linear-gradient(145deg,#b8b6a8 0%,#d2c7a0 43%,#efdf38 100%);}
+.oxygen h2{font-size:min(2.95vw,4.917vh);margin-top:6.7%}
+.oxygen .sub{margin-top:1.8%;text-align:right;font-size:min(0.95vw,1.583vh)}
+.wave{position:absolute;left:8%;right:8%;bottom:6%;width:84%;height:41%;opacity:.92}
+.inflammation{grid-column:2;grid-row:2;background:linear-gradient(145deg,#d4c4a5 0%,#e7ad8c 44%,#dda08a 66%,#859ca0 100%)}
+.inflammation h2{font-size:min(2.85vw,4.75vh);margin-top:7.2%}
+.gauge{position:absolute;left:7%;right:7%;bottom:13%;width:86%;height:36%;opacity:.94}
+.scale-labels{position:absolute;left:7%;right:7%;bottom:3.2%;display:flex;justify-content:space-between;color:#e9eee8c7;font-size:min(0.72vw,1.2vh);line-height:1}
+.bottomtile{grid-row:3;padding:7% 8%;background:linear-gradient(135deg,#bca653 0%,#dfbc58 53%,#f0d06d 100%)}
+.micro h2{font-size:min(1.72vw,2.867vh);letter-spacing:-.06em;margin-top:0;font-weight:470}
+.bottomtile .label{font-size:min(0.76vw,1.267vh);color:#fff8dfc9;margin-top:1.5%}
+.bottomtile .corner{top:7%;right:7%}
+.bottom-art{position:absolute;width:64%;height:57%;bottom:5%;left:18%;opacity:.76}
+.blood{background:linear-gradient(135deg,#cdb66d 0%,#dfa16d 55%,#e4b67e 100%)}
+.blood h2{font-size:min(1.7vw,2.833vh);margin-top:0;font-weight:460}
+.blood .bottom-art{width:78%;height:61%;left:11%;bottom:1%;opacity:.68}
+.insight{padding:0;background:linear-gradient(130deg,#dbd7c7,#91917d 55%,#4d5549)}
+.insight-art{position:absolute;inset:0;width:100%;height:100%;}
+.insight:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(34,39,32,.62),transparent 70%),linear-gradient(90deg,rgba(225,218,190,.25),transparent 75%);z-index:1}
+.tag{position:absolute;z-index:3;left:5%;top:5%;font-size:min(0.69vw,1.15vh);line-height:1;background:rgba(39,41,36,.64);padding:.5% 2.7%;border-radius:2px;color:#f1f0e8;white-space:nowrap}
+.insighttext{position:absolute;z-index:3;left:7%;bottom:7%;font-size:min(0.98vw,1.633vh);line-height:1.15;color:#fffdf2;font-weight:420;letter-spacing:-.025em}
+.quick svg,.mini .symbol,.ageart,.wave,.gauge,.bottom-art{stroke-linecap:round;stroke-linejoin:round}
+
+/* ==================================================================
+   MATERIAL BASE — high-frequency micro-grain. Smooth gradients show
+   no displacement under refraction (uniform colour displaced is still
+   the same colour), so the glass needs fine structure behind it.
+   ================================================================== */
+.grain{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.5;
+  background-image:var(--noise);background-size:140px 140px;mix-blend-mode:multiply}
+/* A purely random backdrop cannot reveal refraction — a random field displaced
+   is still a random field. The left column therefore carries a periodic halftone
+   on top of the grain, so the refracted rim reads as a bend, not as new noise. */
+.left>.grain{opacity:.34;background-image:var(--halftone),var(--noise);
+  background-size:5px 5px,140px 140px}
+.tile>.grain{opacity:.3;mix-blend-mode:overlay}
+.timeline>.grain{opacity:.22;mix-blend-mode:overlay;z-index:1}
+.tl-svg{position:absolute;inset:0;display:block;width:100%;height:100%;z-index:2}
+@media(prefers-reduced-motion:reduce){.grain{background-image:none}}
+
+/* ==================================================================
+   LIQUID GLASS
+   Surfaces get `backdrop-filter: blur() saturate() url(#lgN)`, where
+   #lgN is a generated SVG filter: feImage(displacement map) ->
+   feDisplacementMap. The map encodes the Snell-refracted lateral
+   offset (R = dx, G = dy, 128 = none). See buildGlassMap().
+   ================================================================== */
+.glass{isolation:isolate;background:var(--glass-tint);
+  -webkit-backdrop-filter:blur(5px) saturate(1.7) brightness(1.03);
+  backdrop-filter:blur(5px) saturate(1.7) brightness(1.03);
+  box-shadow:inset 0 1px 0 var(--glass-edge),inset 0 -1px 0 rgba(255,255,255,.22),inset 0 0 0 1px rgba(255,255,255,.14),0 6px 22px rgba(28,32,26,.13)}
+/* specular sheen — a soft top-left highlight laid over the refracted image */
+.glass:after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;z-index:0;
+  background:linear-gradient(148deg,rgba(255,255,255,.5),rgba(255,255,255,.06) 34%,rgba(255,255,255,0) 62%)}
+
+/* --- control rail (nav + transport), floating over the portrait --- */
+.quick{position:absolute;border:0;background:transparent;border-radius:min(0.9vw,1.5vh);z-index:6}
+.quick span{border-bottom:1px solid rgba(255,255,255,.34);color:#4a4d45;cursor:pointer;
+  transition:background .22s ease,color .22s ease}
+.quick span:last-child{border-bottom:0}
+.quick span:hover{background:rgba(255,255,255,.4);color:#22251f}
+.quick span:active{background:rgba(255,255,255,.62)}
+.quick span svg{pointer-events:none}
+.hud{position:absolute;left:1.3%;top:52.4%;z-index:6;display:flex;flex-direction:column;
+  border-radius:min(0.9vw,1.5vh);overflow:hidden}
+.hud button{width:min(3.25vw,5.417vh);height:min(3.15vw,5.25vh);display:grid;place-items:center;
+  border:0;border-bottom:1px solid rgba(255,255,255,.34);background:transparent;color:#4a4d45;
+  cursor:pointer;padding:0;transition:background .22s ease,color .22s ease}
+.hud button:last-of-type{border-bottom:0}
+.hud button:hover{background:rgba(255,255,255,.4);color:#22251f}
+.hud button:active{background:rgba(255,255,255,.62)}
+.hud svg{width:min(1.1vw,1.833vh);height:min(1.1vw,1.833vh);stroke:currentColor;fill:none;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
+[data-state=paused] .quick,[data-state=paused] .hud{--glass-tint:rgba(255,247,214,.34)}
+
+/* --- timeline tooltip (glass) --- */
+.tl-tip{position:absolute;bottom:118%;z-index:12;min-width:min(11vw,18.3vh);padding:min(0.9vw,1.5vh) min(1.05vw,1.75vh);
+  border-radius:min(0.8vw,1.33vh);color:#26291f;font-size:min(0.82vw,1.367vh);line-height:1.34;
+  opacity:0;transform:translateY(6px) scale(.96);pointer-events:none;
+  transition:opacity .18s ease,transform .22s cubic-bezier(.2,.8,.3,1);white-space:nowrap}
+.tl-tip.on{opacity:1;transform:translateY(0) scale(1)}
+.tl-tip b{display:block;font-weight:600;letter-spacing:-.02em}
+.tl-tip i{font-style:normal;color:#6d7066;display:block;font-size:min(0.72vw,1.2vh);margin-top:min(0.24vw,.4vh)}
+.tl-tip .tl-bpm{font-size:min(1.25vw,2.083vh);font-weight:520;letter-spacing:-.04em;display:block;margin-top:min(0.3vw,.5vh)}
+.tl-cursor{position:absolute;top:0;bottom:0;width:1px;background:#2c3128;opacity:0;z-index:9;pointer-events:none}
+.tl-cursor:before{content:"";position:absolute;top:-3px;left:-2.5px;width:6px;height:6px;border-radius:50%;background:#2c3128}
+.tl-hit{position:absolute;inset:0;z-index:10;cursor:ew-resize}
+.tl-live{position:absolute;right:0;top:-38%;font-size:min(0.62vw,1.033vh);letter-spacing:.08em;color:#6f7268}
+.tl-live b{color:#3c4038}
+
+/* --- vessel overlay --- */
+.vessels{position:absolute;left:16.2%;top:7%;width:63%;height:87%;z-index:2;pointer-events:none;
+  opacity:0;transition:opacity .5s ease}
+.vessels.on{opacity:1}
+.vessels path{fill:none;stroke:#dceb1f;stroke-width:1.1;vector-effect:non-scaling-stroke;opacity:.72}
+.vessels .flow{stroke:#f6ff9c;stroke-width:2.4;stroke-dasharray:4 96;opacity:.95;
+  animation:flow 3.4s linear infinite;filter:drop-shadow(0 0 3px rgba(224,242,71,.9))}
+.vessels .node{fill:#e0f247}
+.vessels .ring{fill:none;stroke:#e0f247;stroke-width:1;opacity:.5;transform-box:fill-box;transform-origin:center;
+  animation:ringOut 2.4s ease-out infinite}
+@keyframes flow{to{stroke-dashoffset:-100}}
+@keyframes ringOut{0%{transform:scale(.4);opacity:.7}100%{transform:scale(2.4);opacity:0}}
+
+/* --- beat-reactive feedback --- */
+@media(prefers-reduced-motion:no-preference){
+  .heading,.brand,.quick,.hud,.metrics,.vitals,.today{animation:riseIn .72s cubic-bezier(.22,.85,.28,1) both}
+  .brand{animation-delay:.04s}.heading{animation-delay:.09s}.quick{animation-delay:.16s}.hud{animation-delay:.2s}
+  .metrics{animation-delay:.26s}.pressure{animation-delay:.32s}.sound{animation-delay:.36s}.today{animation-delay:.42s}
+  .tile{animation:tileIn .78s cubic-bezier(.22,.85,.28,1) both}
+  .age{animation-delay:.1s}.oxygen{animation-delay:.18s}.inflammation{animation-delay:.26s}
+  .bottomtile.micro{animation-delay:.34s}.bottomtile.blood{animation-delay:.42s}
+  @keyframes riseIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+  @keyframes tileIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+  .ageart ellipse,.gauge path,.ageart path{stroke-dasharray:var(--len,600);stroke-dashoffset:var(--len,600);
+    animation:drawIn 1.5s cubic-bezier(.3,.8,.3,1) both}
+  .age .ageart{animation-delay:.28s}.oxygen .wave{animation-delay:.36s}.inflammation .gauge{animation-delay:.44s}
+  @keyframes drawIn{to{stroke-dashoffset:0}}
+  .wave-scroll{animation:waveShift 7s linear infinite}
+  .wave-scroll.b{animation-duration:9.5s;animation-direction:reverse}
+  .wave-scroll.c{animation-duration:12s}
+  .wave-scroll.d{animation-duration:16s;animation-direction:reverse}
+  @keyframes waveShift{from{transform:translateX(0)}to{transform:translateX(-110px)}}
+}
+/* beat pulse driven from JS via --beat (0..1 decaying each frame) */
+.pulsepoint{will-change:transform;transform:scale(calc(1 + var(--beat,0) * 1.5));
+  box-shadow:0 0 0 calc(min(0.7vw,1.167vh) * (1 + var(--beat,0)*5)) rgba(224,242,71,calc(.14 - var(--beat,0)*.1))}
+.pulsepoint:after{content:"";position:absolute;inset:0;border-radius:50%;
+  border:1px solid rgba(224,242,71,.7);transform:scale(calc(1 + var(--beat,0)*5.5));opacity:calc(var(--beat,0)*.85)}
+.sound strong,.pressure strong{transition:text-shadow .3s ease}
+[data-beat=high] .sound strong{text-shadow:0 0 min(0.8vw,1.333vh) rgba(224,242,71,.55)}
+.vitals.pulse strong{animation:numPulse .42s cubic-bezier(.2,.8,.3,1)}
+@keyframes numPulse{0%{transform:none}32%{transform:scale(1.045)}100%{transform:none}}
+.num-up{transition:color .6s ease}.num-bad{transition:color .6s ease}
+
+/* --- tiles become interactive --- */
+.tile{cursor:pointer;transition:transform .42s cubic-bezier(.2,.8,.3,1),box-shadow .42s ease,filter .42s ease}
+.tile:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(24,30,22,.20)}
+.tile:hover .corner{transform:translate(2px,-2px) scale(1.14);opacity:1}
+.corner{transition:transform .38s cubic-bezier(.2,.8,.3,1),opacity .38s ease;opacity:.72}
+.tile:focus-visible{outline:2px solid #e0f247;outline-offset:3px}
+.tile-veil{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0;transition:opacity .38s ease;
+  background:radial-gradient(120% 90% at 12% 0%,rgba(255,255,255,.22),transparent 60%)}
+.tile:hover .tile-veil{opacity:1}
+
+/* --- detail drawer (large glass surface) --- */
+.drawer{position:fixed;inset:0;z-index:40;display:grid;place-items:center;opacity:0;pointer-events:none;
+  transition:opacity .3s ease}
+.drawer.on{opacity:1;pointer-events:auto}
+.drawer-scrim{position:absolute;inset:0;background:rgba(28,32,26,.24);backdrop-filter:blur(1.5px);-webkit-backdrop-filter:blur(1.5px)}
+.card{position:relative;width:min(38vw,min(620px,86vh));padding:min(2.1vw,3.5vh) min(2.3vw,3.83vh) min(1.9vw,3.17vh);
+  border-radius:min(1.5vw,2.5vh);color:#252822;transform:translateY(16px) scale(.975);
+  transition:transform .46s cubic-bezier(.2,.85,.25,1);--glass-tint:rgba(255,255,255,.56)}
+.drawer.on .card{transform:none}
+.card h3{margin:0;font-size:min(1.5vw,2.5vh);font-weight:480;letter-spacing:-.04em}
+.card .card-kicker{font-size:min(0.8vw,1.333vh);letter-spacing:.1em;text-transform:uppercase;color:#8b8e83}
+.card .card-row{display:flex;align-items:flex-end;justify-content:space-between;gap:2%;margin-top:min(1.1vw,1.83vh)}
+.card .card-val{font-size:min(3.4vw,5.67vh);line-height:.9;font-weight:440;letter-spacing:-.07em;font-variant-numeric:tabular-nums}
+.card .card-unit{font-size:min(1vw,1.67vh);color:#7c7f74;margin-left:.35em;letter-spacing:0}
+.card .card-delta{font-size:min(0.88vw,1.467vh);padding:.34em .7em;border-radius:99px;background:rgba(224,242,71,.34);color:#4a4f33}
+.card .card-delta.warn{background:rgba(255,196,84,.34);color:#5d4a1c}
+.spark{display:block;width:100%;height:min(9vw,15vh);margin-top:min(1.2vw,2vh);overflow:visible}
+.spark .axis{stroke:rgba(37,40,34,.14);stroke-width:1;vector-effect:non-scaling-stroke}
+.spark .line{fill:none;stroke:#4d5340;stroke-width:1.6;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
+.spark .area{fill:url(#sparkFill);opacity:.5}
+.spark .dot{fill:#e0f247;stroke:#3c4131;stroke-width:1.2;vector-effect:non-scaling-stroke}
+.card-stats{display:flex;gap:min(1.6vw,2.67vh);margin-top:min(1.1vw,1.83vh);font-size:min(0.8vw,1.333vh);color:#6f7268}
+.card-stats b{display:block;color:#2b2e27;font-size:min(1.05vw,1.75vh);font-weight:520;font-variant-numeric:tabular-nums}
+.card-close{position:absolute;right:min(1.1vw,1.83vh);top:min(1.1vw,1.83vh);width:min(2.1vw,3.5vh);height:min(2.1vw,3.5vh);
+  display:grid;place-items:center;border:0;border-radius:50%;background:rgba(255,255,255,.34);color:#3d4136;cursor:pointer;
+  transition:background .24s ease,transform .24s ease}
+.card-close:hover{background:rgba(255,255,255,.62);transform:rotate(90deg)}
+.card-close svg{width:52%;height:52%;stroke:currentColor;stroke-width:1.5;fill:none;stroke-linecap:round}
+.card-meta{display:flex;gap:min(1.4vw,2.33vh);align-items:center;margin-top:min(1vw,1.67vh);
+  padding-top:min(0.9vw,1.5vh);border-top:1px solid rgba(37,40,34,.1);font-size:min(0.76vw,1.267vh);color:#83867b}
+.card-meta span{display:inline-flex;align-items:center;gap:.42em}
+.card-meta em{font-style:normal;color:#4d5242;font-weight:500}
+.live-dot{display:inline-block;width:.55em;height:.55em;border-radius:50%;background:#b7433a;
+  box-shadow:0 0 0 0 rgba(183,67,58,.5);animation:liveDot 1.9s ease-out infinite}
+@keyframes liveDot{0%{box-shadow:0 0 0 0 rgba(183,67,58,.5)}70%{box-shadow:0 0 0 .5em rgba(183,67,58,0)}100%{box-shadow:0 0 0 0 rgba(183,67,58,0)}}
+
+/* --- toast --- */
+.toast{position:fixed;left:50%;bottom:min(4vh,32px);transform:translate(-50%,14px);z-index:50;
+  padding:min(0.9vw,1.5vh) min(1.3vw,2.17vh);border-radius:99px;color:#2b2e27;font-size:min(0.85vw,1.417vh);
+  opacity:0;pointer-events:none;transition:opacity .26s ease,transform .34s cubic-bezier(.2,.85,.25,1)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* --- quiet helper chips --- */
+.hint{position:absolute;left:1.3%;top:31.4%;z-index:6;font-size:min(0.62vw,1.033vh);letter-spacing:.09em;
+  text-transform:uppercase;color:#a3a69b;white-space:nowrap}
+
+/* ==================================================================
+   CHINESE TYPOGRAPHY
+   The display sizes above carry negative tracking chosen to make the
+   Latin lockup read as one mass.  CJK glyphs are full-width squares, so
+   the same values collide.  These rules relax the tracking - and only
+   the tracking - while Chinese is active.
+   ================================================================== */
+html[lang="zh-CN"] .heading{letter-spacing:-.02em}
+html[lang="zh-CN"] .today-label{letter-spacing:0}
+html[lang="zh-CN"] .mini b{letter-spacing:0}
+html[lang="zh-CN"] .insighttext{letter-spacing:0}
+html[lang="zh-CN"] .card h3{letter-spacing:-.01em}
+html[lang="zh-CN"] .age .label,
+html[lang="zh-CN"] .label{letter-spacing:0}
+html[lang="zh-CN"] .vitals small,
+html[lang="zh-CN"] .vitals em{letter-spacing:0}
+html[lang="zh-CN"] .quick span,
+html[lang="zh-CN"] .hud button{letter-spacing:0}
+
+@media(max-aspect-ratio:1/1){body{overflow:auto}.dashboard{left:0;right:0;top:50%;bottom:auto;height:auto;aspect-ratio:5/3;transform:translateY(-50%)}
+  .card{width:min(78vw,520px)}}
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+<body>
+<div class="scene">
+  <main class="screen" data-i18n-aria="screenAria" aria-label="Neka 心脏与循环仪表盘">
+    <div class="dashboard" id="dash">
+      <section class="left">
+        <i class="grain" aria-hidden="true"></i>
+        <div class="brand"><span class="sunmark">✺</span><span>Neka</span><span class="langtog" id="langTog" role="group" aria-label="语言 / Language"><button type="button" data-lang="zh" aria-pressed="true">中</button><button type="button" data-lang="en" aria-pressed="false">EN</button></span></div>
+        <div class="heading" data-i18n-html="heading">心脏与<br>血液循环</div>
+        <div class="hint" id="hint">Neka · 实时监测 · 20×</div>
+
+        <div class="quick glass" data-glass data-i18n-aria="quickNav" aria-label="快速导航">
+          <span role="button" tabindex="0" id="qAdd" data-i18n-tip="logReading" data-tip="记录一次读数"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4.4v11.2M4.4 10h11.2"/></svg></span>
+          <span role="button" tabindex="0" id="qExport" data-i18n-tip="exportSession" data-tip="导出会话"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5.4 6.2h9.2l-.85 10.2H6.25L5.4 6.2Z"/><path d="M7.6 6.2V3.6h4.8v2.6"/><path d="M8.15 8.6v6M10 8.6v6M11.85 8.6v6"/></svg></span>
+          <span role="button" tabindex="0" id="qVessels" data-i18n-tip="vesselNetwork" data-tip="血管网络"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="5.1" r="2.05"/><circle cx="5.4" cy="14.6" r="2.05"/><circle cx="14.6" cy="14.6" r="2.05"/><path d="M9.11 6.95 6.29 12.75M10.89 6.95l2.82 5.8M7.45 14.6h5.1"/></svg></span>
+        </div>
+
+        <div class="hud glass" data-glass data-i18n-aria="simControls" aria-label="模拟控制">
+          <button id="btnPlay" data-i18n-aria="pause" aria-label="暂停实时模拟"><svg viewBox="0 0 20 20" id="icoPlay" aria-hidden="true"><path d="M7.2 4.6v10.8M12.8 4.6v10.8"/></svg></button>
+          <button id="btnReset" data-i18n-aria="reset" aria-label="重置读数"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10a6 6 0 1 1-1.9-4.4"/><path d="M16.2 3.2v3.1h-3.1"/></svg></button>
+          <button id="btnSnapshot" data-i18n-aria="snapshot" aria-label="拍摄快照"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.4 7.2h2.3l1.3-2h5.99l1.3 2h2.3v7.3H3.4z"/><circle cx="10" cy="10.7" r="2.35"/></svg></button>
+        </div>
+
+        <svg class="vessels" id="vessels" viewBox="0 0 100 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <g id="vesselPaths"></g>
+          <g id="vesselNodes"></g>
+        </svg>
+
+        <img class="person" src="8f2b7046d5de3c1f2dab62821307a6fb.png" data-i18n-alt="portraitAlt" alt="人体侧脸肖像" draggable="false">
+
+        <div class="metrics">
+          <div class="mini"><svg class="symbol" id="artNet" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width=".8" aria-hidden="true"><path d="M20 5.5 32.56 12.75 32.56 27.25 20 34.5 7.44 27.25 7.44 12.75Z"/><path d="M20 20V5.5M20 20l12.56-7.25M20 20l12.56 7.25M20 20v14.5M20 20l-12.56 7.25M20 20l-12.56-7.25"/><g fill="currentColor" stroke="none"><circle cx="20" cy="5.5" r="1.9"/><circle cx="32.56" cy="12.75" r="1.9"/><circle cx="32.56" cy="27.25" r="1.9"/><circle cx="20" cy="34.5" r="1.9"/><circle cx="7.44" cy="27.25" r="1.9"/><circle cx="7.44" cy="12.75" r="1.9"/><circle cx="20" cy="20" r="2.5"/></g></svg><b data-i18n="arterialHealth">动脉健康</b><small id="artState" data-i18n="artMonitor">监测中</small></div>
+          <div class="mini"><svg class="symbol" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><path id="ecgPath" d="M3.5 20h33"/></svg><b data-i18n="heartRhythm">心律</b><small><span id="hrNum">62</span> <span data-i18n="bpmUnit">次/分</span> · <span id="rhythmState" data-i18n="rNormal">正常</span></small></div>
+        </div>
+
+        <div class="vitals pressure" id="vPressure"><strong><span id="sysVal">92</span><sup>/<span id="diaVal">57</span></sup></strong><small data-i18n="armPressure">上臂血压</small><em id="bpState" data-i18n="bpHN">正常偏高</em></div>
+        <div class="vitals sound" id="vSound"><strong id="hsVal">120</strong><small data-i18n="heartSound">心音</small><em id="hsState" data-i18n="hsOptimal">理想</em></div>
+        <span class="pulsepoint pp1" data-pulse="1"></span><span class="pulsepoint pp2" data-pulse="2"></span>
+
+        <div class="today">
+          <span class="today-label" data-i18n="todayData">今日数据</span>
+          <div class="timeline" id="timeline">
+            <i class="grain" aria-hidden="true"></i>
+            <svg class="tl-svg" id="tlSvg" aria-hidden="true"></svg>
+            <div class="tl-hit" id="tlHit" role="slider" tabindex="0" data-i18n-aria="scrubAria" aria-label="回溯今日数据" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"></div>
+            <div class="tl-cursor" id="tlCursor" aria-hidden="true"></div>
+            <div class="tl-tip glass" id="tlTip" data-glass data-glass-blur="7"><span class="tl-bpm" id="tipBpm">62</span><b id="tipTime">13:15</b><i id="tipNote" data-i18n="noteResting">静息</i></div>
+          </div>
+          <span class="tl-live" id="tlLive" aria-live="polite"><span id="tlMode" data-i18n="live">实时</span> <b id="tlClock">13:15</b></span>
+          <span class="traildot">●</span>
+          <span class="trailtime" id="timelineEnd">13:20</span>
+        </div>
+      </section>
+
+      <section class="right">
+        <article class="tile age" tabindex="0" data-metric="age" role="button" data-i18n-aria="ageAria" aria-label="心脏年龄详情"><i class="grain" aria-hidden="true"></i><i class="tile-veil"></i><div class="label" data-i18n-html="ageLabel">心脏年龄 <span>日期&nbsp; 2026&nbsp; ⌄</span></div><h2 data-count="25">25</h2><div class="sub"><span data-i18n="years">岁</span> <span id="ageDelta">-6 <small data-i18n="years">岁</small></span></div>
+          <svg class="ageart" viewBox="0 0 180 230" fill="none" aria-hidden="true">
+            <g stroke="#f4ffd7" stroke-width=".7" opacity=".63">
+              <ellipse cx="90" cy="72" rx="54" ry="32"/><ellipse cx="90" cy="72" rx="50" ry="29"/><ellipse cx="90" cy="72" rx="43" ry="24"/><ellipse cx="90" cy="72" rx="31" ry="17"/><ellipse cx="90" cy="72" rx="18" ry="10"/>
+              <ellipse cx="90" cy="158" rx="54" ry="32"/><ellipse cx="90" cy="158" rx="50" ry="29"/><ellipse cx="90" cy="158" rx="43" ry="24"/><ellipse cx="90" cy="158" rx="31" ry="17"/><ellipse cx="90" cy="158" rx="18" ry="10"/>
+              <ellipse cx="90" cy="72" rx="18" ry="54"/><ellipse cx="90" cy="72" rx="35" ry="54"/><ellipse cx="90" cy="72" rx="47" ry="54"/>
+              <ellipse cx="90" cy="158" rx="18" ry="54"/><ellipse cx="90" cy="158" rx="35" ry="54"/><ellipse cx="90" cy="158" rx="47" ry="54"/>
+              <path d="M35 72H145M35 158H145M90 18V212" opacity=".25"/>
+            </g><circle cx="90" cy="115" r="3.8" fill="#e3f342"/><circle cx="90" cy="115" r="7" fill="#e3f342" opacity=".13"/>
+          </svg>
+          <div class="agefoot"><span><i class="dot"></i><br><span data-i18n="younger">更年轻</span></span><span data-i18n="older">更年长</span></div>
+        </article>
+
+        <article class="tile oxygen" tabindex="0" data-metric="spo2" role="button" data-i18n-aria="spo2Aria" aria-label="血氧详情"><i class="grain" aria-hidden="true"></i><i class="tile-veil"></i><span class="corner">↗</span><div class="label" data-i18n="bloodOxygen">血氧</div><h2 data-count="99" data-dec="0">99</h2><div class="sub" id="spo2State" data-i18n="spNormal">正常</div>
+          <svg class="wave" viewBox="0 0 220 90" preserveAspectRatio="none" fill="none" aria-hidden="true"><g stroke="#fff" stroke-width="1" opacity=".76"><path class="wave-scroll" d=""/><path class="wave-scroll b" opacity=".72" d=""/><path class="wave-scroll c" opacity=".65" d=""/><path class="wave-scroll d" opacity=".35" d=""/></g><circle cx="2" cy="54" r="2.7" fill="#fff"/><circle cx="218" cy="36" r="2.7" fill="#fff"/></svg>
+        </article>
+
+        <article class="tile inflammation" tabindex="0" data-metric="crp" role="button" data-i18n-aria="crpAria" aria-label="炎症详情"><i class="grain" aria-hidden="true"></i><i class="tile-veil"></i><span class="corner">↗</span><div class="label" data-i18n="inflammation">炎症 hs-CRP</div><h2 data-count="0.5" data-dec="1">0.5</h2>
+          <svg class="gauge" viewBox="0 0 220 100" preserveAspectRatio="none" fill="none" aria-hidden="true"><g stroke="#fff" stroke-width="1.05" opacity=".76"><path d="M9 87 A31 31 0 0 1 71 87"/><path d="M9 87 A56 56 0 0 1 121 87"/><path d="M9 87 A80 80 0 0 1 169 87"/><path d="M9 87 A103 103 0 0 1 215 87"/><path d="M9 87H215" opacity=".35"/></g><g fill="#fff"><circle cx="9" cy="87" r="2.1"/><circle cx="40" cy="87" r="1.8"/><circle cx="71" cy="87" r="1.8"/><circle cx="121" cy="87" r="1.8"/><circle cx="169" cy="87" r="1.8"/><circle cx="215" cy="87" r="1.8"/></g><circle id="crpFill" cx="9" cy="87" r="17" fill="#e3f13e" opacity=".2"/><circle id="crpMark" cx="9" cy="87" r="3.1" fill="#e3f13e"/></svg>
+          <div class="scale-labels"><span data-i18n="optimal">理想</span><span data-i18n="mid">中等</span><span data-i18n="moderate">中度</span><span data-i18n="high">偏高</span></div>
+        </article>
+
+        <article class="tile bottomtile micro" tabindex="0" data-metric="micro" role="button" data-i18n-aria="microAria" aria-label="微循环详情"><i class="grain" aria-hidden="true"></i><i class="tile-veil"></i><span class="corner">↗</span><h2 data-count="2000" data-dec="0" data-prefix="+">+2000</h2><div class="label" data-i18n="microcirculation">微循环</div><svg class="bottom-art" viewBox="0 0 100 90" fill="none" aria-hidden="true"><g stroke="#fff6dd" stroke-width=".8"><path d="M50 7C71 14 87 30 78 46C72 61 58 72 50 81C42 72 28 61 22 46C13 30 29 14 50 7Z"/><path d="M50 14C66 19 79 32 71 45C66 56 56 65 50 72C44 65 34 56 29 45C21 32 34 19 50 14Z"/><path d="M50 22C61 26 70 35 64 45C60 52 54 58 50 63C46 58 40 52 36 45C30 35 39 26 50 22Z"/><path d="M50 8V81M21 30L79 49M23 49L77 30" opacity=".35"/></g><circle cx="50" cy="45" r="2.8" fill="#e4f13e"/></svg></article>
+
+        <article class="tile bottomtile blood" tabindex="0" data-metric="blood" role="button" data-i18n-aria="bloodAria" aria-label="血液指标详情"><i class="grain" aria-hidden="true"></i><i class="tile-veil"></i><span class="corner">↗</span><h2 data-count="16" data-dec="0">16</h2><div class="label" data-i18n="bloodwork">血液指标</div><svg class="bottom-art" viewBox="0 0 100 90" fill="none" aria-hidden="true"><g stroke="#efffe2" stroke-width=".9"><path d="M19 17Q50 4 81 17Q50 31 19 17Z"/><path d="M23 28Q50 17 77 28Q50 42 23 28Z"/><path d="M28 39Q50 30 72 39Q50 52 28 39Z"/><path d="M33 50Q50 43 67 50Q50 62 33 50Z"/><path d="M38 61Q50 56 62 61Q50 72 38 61Z"/><path d="M50 17V78" opacity=".7"/></g><circle cx="50" cy="78" r="2.7" fill="#dff34a"/></svg></article>
+
+        <article class="tile insight"><i class="grain" aria-hidden="true"></i><span class="tag" data-i18n="insightTag">◷ 5 分钟</span><svg class="insight-art" viewBox="0 0 160 175" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="skinbase" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5e5c0"/><stop offset=".4" stop-color="#aaa18c"/><stop offset=".72" stop-color="#4e4941"/><stop offset="1" stop-color="#191918"/></linearGradient><filter id="softfocus" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="7"/></filter></defs><rect width="160" height="175" fill="#bcb7a5"/><g filter="url(#softfocus)"><ellipse cx="104" cy="18" rx="35" ry="55" fill="#211f1c"/><path d="M72 -5Q91 18 85 50L60 180H151L139 53Q128 20 143 -8Z" fill="url(#skinbase)"/><path d="M0 105Q35 57 62 78L75 175H0Z" fill="#e5dcbf"/><ellipse cx="100" cy="80" rx="30" ry="53" fill="#5d5549" opacity=".6"/></g><path d="M80 0Q85 29 78 51L61 175H125L119 65Q112 30 130 0Z" fill="url(#skinbase)" opacity=".55"/></svg><div class="insighttext" data-i18n-html="insightText">心脏 · 身体 · 皮肤<br>数据洞察</div></article>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- detail drawer -->
+<div class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-scrim" id="drawerScrim"></div>
+  <div class="card glass" id="card" data-glass data-glass-blur="9" data-glass-saturate="1.35" role="dialog" aria-modal="true" aria-labelledby="cardTitle">
+    <button class="card-close" id="cardClose" data-i18n-aria="closeDetail" aria-label="关闭详情"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5.6 5.6l8.8 8.8M14.4 5.6l-8.8 8.8"/></svg></button>
+    <div class="card-kicker" id="cardKicker" data-i18n="metricKicker">指标</div>
+    <div class="card-row"><h3 id="cardTitle" data-i18n="mAgeTitle">心脏年龄</h3><span class="card-delta" id="cardDelta" data-i18n="stable">平稳</span></div>
+    <div class="card-row"><div class="card-val"><span id="cardVal">25</span><span class="card-unit" id="cardUnit" data-i18n="mAgeUnit">岁</span></div></div>
+    <svg class="spark" id="spark" viewBox="0 0 300 100" preserveAspectRatio="none" aria-hidden="true">
+      <defs><linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e0f247" stop-opacity=".55"/><stop offset="1" stop-color="#e0f247" stop-opacity="0"/></linearGradient></defs>
+      <g id="sparkAxes"></g><path class="area" id="sparkArea" d=""/><path class="line" id="sparkLine" d=""/><circle class="dot" id="sparkDot" cx="0" cy="0" r="3.4"/>
+    </svg>
+    <div class="card-stats"><span><b id="stMin">–</b><span data-i18n="stMinL">最低</span></span><span><b id="stAvg">–</b><span data-i18n="stAvgL">平均</span></span><span><b id="stMax">–</b><span data-i18n="stMaxL">最高</span></span><span><b id="stVar">–</b><span data-i18n="stVarL">波动</span></span></div>
+    <div class="card-meta"><span><i class="live-dot"></i><em id="metaState" data-i18n="metaLive">实时</em></span><span id="metaSrc" data-i18n="mAgeSrc">Apple Health · 血管模型</span><span id="metaSamples" data-i18n="metaSamplesInit">— 个样本</span></div>
+  </div>
+</div>
+
+<div class="toast glass" id="toast" data-glass role="status" aria-live="polite"></div>
+<svg id="lg-host" width="0" height="0" aria-hidden="true" style="position:absolute;left:0;top:0;overflow:hidden"></svg>
+
+<script>
+(function(){
+'use strict';
+
+/* ============================================================================
+   0. UTILITIES
+   ========================================================================== */
+var NS = 'http://www.w3.org/2000/svg';
+var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var clamp = function(v, a, b){ return v < a ? a : (v > b ? b : v); };
+var lerp  = function(a, b, t){ return a + (b - a) * t; };
+var $  = function(s, r){ return (r || document).querySelector(s); };
+var pad2 = function(n){ return (n < 10 ? '0' : '') + n; };
+function fmtClock(sec){
+  sec = ((sec % 86400) + 86400) % 86400;
+  return pad2(Math.floor(sec / 3600)) + ':' + pad2(Math.floor(sec % 3600 / 60));
+}
+function debounce(fn, ms){
+  var t = 0;
+  return function(){ var a = arguments, self = this; clearTimeout(t); t = setTimeout(function(){ fn.apply(self, a); }, ms); };
+}
+
+/* ============================================================================
+   0b. LOCALISATION
+   ----------------------------------------------------------------------------
+   Chinese is the shipped default; English is a runtime toggle.  Every static
+   string in the markup carries one of five data-i18n-* keys and is rewritten
+   by applyStatic(); every string composed at runtime goes through tr().  A
+   language switch re-runs the static pass AND re-renders each dynamic readout,
+   so no stale label - and no stale tooltip captured at bind time - survives.
+   ========================================================================== */
+var I18N = {
+  zh: {
+    title: 'Neka — 心脏与循环',
+    tLangZh: '已切换为中文',
+    tLangEn: 'Switched to English',
+    screenAria: 'Neka 心脏与循环仪表盘',
+    heading: '心脏与<br>血液循环',
+    brandHint: 'Neka · 实时监测 · {x}×',
+    brandPaused: 'Neka · 已暂停 · {x}×',
+    quickNav: '快速导航',
+    simControls: '模拟控制',
+    logReading: '记录一次读数',
+    exportSession: '导出会话',
+    vesselNetwork: '血管网络',
+    pause: '暂停实时模拟',
+    resume: '继续实时模拟',
+    reset: '重置读数',
+    snapshot: '拍摄快照',
+    portraitAlt: '人体侧脸肖像',
+    arterialHealth: '动脉健康',
+    heartRhythm: '心律',
+    bpmUnit: '次/分',
+    bpmShort: '次/分',
+    armPressure: '上臂血压',
+    heartSound: '心音',
+    todayData: '今日数据',
+    scrubAria: '回溯今日数据',
+    noteResting: '静息',
+    noteDeepRest: '深度休息',
+    noteActive: '检测到活动',
+    live: '实时',
+    history: '历史',
+    ariaValueText: '{time}，每分钟 {bpm} 次',
+    artExcellent: '优秀', artMonitor: '监测中', artReview: '需复检',
+    bpElevated: '偏高', bpLow: '偏低', bpHN: '正常偏高',
+    hsStrong: '偏强', hsSoft: '偏弱', hsOptimal: '理想',
+    rTachy: '偏快', rBrady: '偏慢', rVaried: '波动', rNormal: '正常',
+    spNormal: '正常', spFair: '尚可', spWatch: '关注',
+    ageAria: '心脏年龄详情',
+    ageLabel: '心脏年龄 <span>日期&nbsp; 2026&nbsp; ⌄</span>',
+    years: '岁', younger: '更年轻', older: '更年长',
+    spo2Aria: '血氧详情', bloodOxygen: '血氧',
+    crpAria: '炎症详情', inflammation: '炎症 hs-CRP',
+    optimal: '理想', mid: '中等', moderate: '中度', high: '偏高',
+    microAria: '微循环详情', microcirculation: '微循环',
+    bloodAria: '血液指标详情', bloodwork: '血液指标',
+    insightTag: '◷ 5 分钟',
+    insightText: '心脏 · 身体 · 皮肤<br>数据洞察',
+    closeDetail: '关闭详情', metricKicker: '指标', stable: '平稳',
+    stMinL: '最低', stAvgL: '平均', stMaxL: '最高', stVarL: '波动',
+    metaLive: '实时', metaPaused: '已暂停',
+    metaSamplesInit: '— 个样本',
+    samples: '{n} 个样本',
+    mAgeKicker: '心血管', mAgeTitle: '心脏年龄',
+    mAgeUnit: '岁', mAgeSrc: 'Apple Health · 血管模型', mAgeUs: '岁',
+    mSpo2Kicker: '肺功能', mSpo2Title: '血氧',
+    mSpo2Unit: '%', mSpo2Src: '脉搏血氧仪 · 指尖', mSpo2Us: '%',
+    mCrpKicker: '炎症', mCrpTitle: 'hs-CRP',
+    mCrpUnit: 'mg/L', mCrpSrc: '血液化验 · 07:40 采血', mCrpUs: 'mg/L',
+    mMicroKicker: '灌注', mMicroTitle: '微循环',
+    mMicroUnit: 'au', mMicroSrc: '毛细血管成像 · 左手食指', mMicroUs: 'au',
+    mBloodKicker: '化验组合', mBloodTitle: '血液指标',
+    mBloodUnit: '项达标 / 共 18 项',
+    mBloodSrc: '血液化验 · 最近一次', mBloodUs: '项',
+    tPaused: '模拟已暂停',
+    tResumed: '实时模拟已继续',
+    tReset: '读数已重置为基线',
+    tSnapshot: '快照已保存 · {time} · {bpm} 次/分',
+    tLogged: '读数已记录 · 心率趋势小幅上调',
+    tVesselOn: '血管网络已开启',
+    tVesselOff: '血管网络已关闭',
+    tExported: '会话已导出为 JSON'
+  },
+  en: {
+    title: 'Neka — Heart & Circulation',
+    tLangZh: '已切换为中文',
+    tLangEn: 'Switched to English',
+    screenAria: 'Neka heart and circulation dashboard',
+    heading: 'Heart &<br>Circulation',
+    brandHint: 'Neka · live monitor · {x}×',
+    brandPaused: 'Neka · paused · {x}×',
+    quickNav: 'Quick navigation',
+    simControls: 'Simulation controls',
+    logReading: 'Log a reading',
+    exportSession: 'Export session',
+    vesselNetwork: 'Vessel network',
+    pause: 'Pause live simulation',
+    resume: 'Resume live simulation',
+    reset: 'Reset readings',
+    snapshot: 'Take a snapshot',
+    portraitAlt: 'Human side profile portrait',
+    arterialHealth: 'Arterial health',
+    heartRhythm: 'Heart rhythm',
+    bpmUnit: 'bpm',
+    bpmShort: 'bpm',
+    armPressure: 'arm pressure',
+    heartSound: 'heart sound',
+    todayData: 'Today’s Data',
+    scrubAria: "Scrub today's data",
+    noteResting: 'resting',
+    noteDeepRest: 'deep rest',
+    noteActive: 'activity detected',
+    live: 'LIVE',
+    history: 'HISTORY',
+    ariaValueText: '{time}, {bpm} beats per minute',
+    artExcellent: 'Excellent', artMonitor: 'Monitor', artReview: 'Review',
+    bpElevated: 'Elevated', bpLow: 'Low', bpHN: 'High-normal',
+    hsStrong: 'Strong', hsSoft: 'Soft', hsOptimal: 'Optimal',
+    rTachy: 'Tachy', rBrady: 'Brady', rVaried: 'Varied', rNormal: 'Normal',
+    spNormal: 'Normal', spFair: 'Fair', spWatch: 'Watch',
+    ageAria: 'Heart Age detail',
+    ageLabel: 'Heart Age <span>Dates&nbsp; 2026&nbsp; ⌄</span>',
+    years: 'years', younger: 'Younger', older: 'Older',
+    spo2Aria: 'Blood Oxygen detail', bloodOxygen: 'Blood Oxygen',
+    crpAria: 'Inflammation detail', inflammation: 'Inflammation hs-CRP',
+    optimal: 'Optimal', mid: 'Mid', moderate: 'Moderate', high: 'High',
+    microAria: 'Microcirculation detail', microcirculation: 'Microcirculation',
+    bloodAria: 'Bloodwork detail', bloodwork: 'Bloodwork',
+    insightTag: '◷ 5 min',
+    insightText: 'Heart. Body. Skin<br>Data Insights',
+    closeDetail: 'Close detail', metricKicker: 'Metric', stable: 'stable',
+    stMinL: 'min', stAvgL: 'avg', stMaxL: 'max', stVarL: 'variability',
+    metaLive: 'Live', metaPaused: 'Paused',
+    metaSamplesInit: '— samples',
+    samples: '{n} samples',
+    mAgeKicker: 'Cardiovascular', mAgeTitle: 'Heart Age',
+    mAgeUnit: 'years', mAgeSrc: 'Apple Health · vascular model', mAgeUs: 'years',
+    mSpo2Kicker: 'Pulmonary', mSpo2Title: 'Blood Oxygen',
+    mSpo2Unit: '%', mSpo2Src: 'Pulse oximeter · finger', mSpo2Us: '%',
+    mCrpKicker: 'Inflammation', mCrpTitle: 'hs-CRP',
+    mCrpUnit: 'mg/L', mCrpSrc: 'Bloodwork · 07:40 draw', mCrpUs: 'mg/L',
+    mMicroKicker: 'Perfusion', mMicroTitle: 'Microcirculation',
+    mMicroUnit: 'au', mMicroSrc: 'Capillary imaging · left index', mMicroUs: 'au',
+    mBloodKicker: 'Lab panel', mBloodTitle: 'Bloodwork markers',
+    mBloodUnit: 'of 18 in range',
+    mBloodSrc: 'Bloodwork · last panel', mBloodUs: 'marks',
+    tPaused: 'Simulation paused',
+    tResumed: 'Live simulation resumed',
+    tReset: 'Readings reset to baseline',
+    tSnapshot: 'Snapshot saved · {time} · {bpm} bpm',
+    tLogged: 'Reading logged · HR trend nudged up',
+    tVesselOn: 'Vessel network on',
+    tVesselOff: 'Vessel network off',
+    tExported: 'Session exported as JSON'
+  }
+};
+
+var LANG = 'zh';
+
+/* look a key up in the active pack, substituting {placeholders} */
+function tr(key, vars){
+  var pack = I18N[LANG] || I18N.zh;
+  var v = pack[key];
+  if (v == null) v = I18N.en[key];
+  if (v == null) return key;
+  if (vars){
+    for (var k in vars){
+      if (Object.prototype.hasOwnProperty.call(vars, k)) v = v.split('{' + k + '}').join(vars[k]);
+    }
+  }
+  return v;
+}
+
+function eachNode(sel, fn){
+  var list = document.querySelectorAll(sel);
+  for (var i = 0; i < list.length; i++) fn(list[i]);
+}
+
+/* static pass: markup -> translated text / attributes */
+function applyStatic(){
+  document.documentElement.lang = (LANG === 'zh') ? 'zh-CN' : 'en';
+  document.title = tr('title');
+  eachNode('[data-i18n]',      function(n){ n.textContent = tr(n.getAttribute('data-i18n')); });
+  eachNode('[data-i18n-html]', function(n){ n.innerHTML   = tr(n.getAttribute('data-i18n-html')); });
+  eachNode('[data-i18n-aria]', function(n){ n.setAttribute('aria-label', tr(n.getAttribute('data-i18n-aria'))); });
+  eachNode('[data-i18n-alt]',  function(n){ n.setAttribute('alt', tr(n.getAttribute('data-i18n-alt'))); });
+  eachNode('[data-i18n-tip]',  function(n){ n.setAttribute('data-tip', tr(n.getAttribute('data-i18n-tip'))); });
+}
+
+function syncLangButtons(){
+  eachNode('#langTog button', function(b){
+    var on = b.getAttribute('data-lang') === LANG;
+    if (on) b.classList.add('on'); else b.classList.remove('on');
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
+
+function setLang(lang, silent){
+  if (!I18N[lang]) return;
+  LANG = lang;
+  try { localStorage.setItem('neka-lang', lang); } catch (e) {}
+  syncLangButtons();
+  applyStatic();
+  renderTransport();
+  applyBadge();
+  renderVitals();
+  renderTimeline();
+  /* overlays are re-rendered in the new language rather than merely hidden:
+     hidden-but-stale DOM is still wrong the moment it is shown again */
+  if (tipEl && tipAnchor) showHoverTip(tipAnchor);
+  if (el.tlTip.classList.contains('on') && tipX != null) showTip(tipX);
+  if (drawerOpen && currentMetric){ applyMetricLabels(currentMetric); renderSpark(); }
+  if (!silent) toast(tr(lang === 'zh' ? 'tLangZh' : 'tLangEn'));
+}
+
+function initLang(){
+  var saved = null;
+  try { saved = localStorage.getItem('neka-lang'); } catch (e) {}
+  setLang(saved === 'en' ? 'en' : 'zh', true);
+}
+
+function bindLang(){
+  var tog = document.getElementById('langTog');
+  if (!tog) return;
+  tog.addEventListener('click', function(e){
+    var n = e.target;
+    while (n && n !== tog && !(n.getAttribute && n.getAttribute('data-lang'))) n = n.parentNode;
+    if (n && n !== tog) setLang(n.getAttribute('data-lang'));
+    e.preventDefault();
+  });
+}
+
+/* ============================================================================
+   1. LIQUID GLASS
+   ----------------------------------------------------------------------------
+   A real optical model, not a blur:
+
+     (1)  Surface function   z = H(x, y)
+          H is derived from a signed distance field d(x,y) to the panel's
+          rounded-rect silhouette.  z rises from 0 on the silhouette to Z
+          across a bevel band of width `bevel` using a parabola profile
+          z = Z·t·(2−t), t = clamp(d/bevel).  That profile has its steepest
+          slope on the outer rim and is flat in the interior — i.e. a real
+          bevelled slab, not a dome.
+
+     (2)  Surface normal      N = normalize(−∂H/∂x, −∂H/∂y, 1)
+          computed by central differences.
+
+     (3)  Refraction          R = refract(I, N, n₁/n₂) with I = (0,0,−1)
+          (orthographic front view),  n_air = 1,  n_glass = 1.5.
+          Snell:  k = 1 − η²(1 − cos²θᵢ),  R = ηI + (η·cosθᵢ − √k)·N.
+          The lateral walk of the refracted ray through a slab of thickness T
+          is the sampling offset:  Δ = T · R_xy / |R_z|.
+
+     (4)  Displacement map    R channel = Δx, G channel = Δy, biased at 128.
+          feDisplacementMap computes P'(x,y) = P(x + scale·(R/255 − ½), …),
+          so with scale = 2·max|Δ| the map reproduces Δ exactly.
+
+     (5)  Dispersion          red / green / blue are displaced by slightly
+          different effective indices (0.93 / 1.00 / 1.09 of the offset),
+          then recombined additively — this is what produces the coloured
+          fringing real glass shows at its rim.
+
+   The filter is attached with `backdrop-filter: … url(#lgN)`, so the SVG
+   graph operates on the *backdrop* image.  Verified: plain `filter: url()`
+   does not touch the backdrop in Chrome and must not be used.
+   ========================================================================== */
+var Glass = (function(){
+  var host = document.getElementById('lg-host');
+  var cache = Object.create(null);
+  var uid = 0;
+
+  function sdRoundRect(px, py, w, h, r){
+    var qx = Math.abs(px - w / 2) - (w / 2 - r);
+    var qy = Math.abs(py - h / 2) - (h / 2 - r);
+    var ax = Math.max(qx, 0), ay = Math.max(qy, 0);
+    return Math.hypot(ax, ay) + Math.min(Math.max(qx, qy), 0) - r;
+  }
+
+  /* (1)-(4): build the RG displacement map for a w×h panel */
+  function buildMap(w, h, cfg){
+    var total = w * h;
+    var k = total > 190000 ? Math.sqrt(190000 / total) : 1;   // resolution guard
+    var pw = Math.max(16, Math.round(w * k));
+    var ph = Math.max(16, Math.round(h * k));
+
+    var minSide = Math.min(w, h);
+    var radius  = Math.min(cfg.radius || minSide * 0.26, minSide / 2);
+    var bevel   = clamp(cfg.bevel != null ? cfg.bevel : minSide * 0.16, 6, 34);
+    var thick   = clamp(cfg.thickness != null ? cfg.thickness : minSide * 0.28, 6, 46);
+    var ior     = cfg.ior || 1.5;
+    var strength= cfg.strength != null ? cfg.strength : 1;
+    var Z  = bevel * 0.5 * strength;
+    var eta = 1 / ior;
+    var eps = Math.max(0.5, 1.1 / k);
+
+    var Hf = function(x, y){
+      var d = -sdRoundRect(x, y, w, h, radius);
+      if (d <= 0) return 0;
+      var t = d >= bevel ? 1 : d / bevel;
+      return Z * t * (2 - t);
+    };
+
+    var cv = document.createElement('canvas');
+    cv.width = pw; cv.height = ph;
+    var ctx = cv.getContext('2d');
+    var img = ctx.createImageData(pw, ph);
+    var data = img.data;
+    var dxs = new Float32Array(pw * ph);
+    var dys = new Float32Array(pw * ph);
+    var maxMag = 0;
+    var i, x, y, cx, cy, nx, ny, nz, L, cosi, kk, s, rx, ry, rz, tt, dx, dy, m;
+
+    for (y = 0; y < ph; y++){
+      for (x = 0; x < pw; x++){
+        cx = (x + 0.5) / k; cy = (y + 0.5) / k;
+        /* (2) normal */
+        nx = -(Hf(cx + eps, cy) - Hf(cx - eps, cy)) / (2 * eps);
+        ny = -(Hf(cx, cy + eps) - Hf(cx, cy - eps)) / (2 * eps);
+        nz = 1;
+        L = Math.hypot(nx, ny, nz); nx /= L; ny /= L; nz /= L;
+        /* (3) Snell refraction */
+        dx = 0; dy = 0;
+        cosi = nz;
+        kk = 1 - eta * eta * (1 - cosi * cosi);
+        if (kk >= 0){
+          s  = eta * cosi - Math.sqrt(kk);
+          rx = s * nx; ry = s * ny; rz = -eta + s * nz;
+          tt = thick / Math.max(1e-6, Math.abs(rz));
+          dx = rx * tt; dy = ry * tt;
+        }
+        m = Math.hypot(dx, dy);
+        if (m > maxMag) maxMag = m;
+        i = y * pw + x;
+        dxs[i] = dx; dys[i] = dy;
+      }
+    }
+
+    /* clamp peak so the rim never samples absurdly far */
+    var norm = Math.min(maxMag, minSide * 0.42) || 1;
+    for (i = 0; i < pw * ph; i++){
+      var p = i * 4;
+      data[p]     = clamp(255 * (0.5 + dxs[i] / (2 * norm)), 0, 255);
+      data[p + 1] = clamp(255 * (0.5 + dys[i] / (2 * norm)), 0, 255);
+      data[p + 2] = 128;
+      data[p + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+    return { url: cv.toDataURL('image/png'), scale: 2 * norm, maxMag: maxMag, k: k };
+  }
+
+  /* (5): wrap the map in an SVG filter, optionally with dispersion */
+  function buildFilter(id, map, w, h, dispersion){
+    var f = document.createElementNS(NS, 'filter');
+    f.setAttribute('id', id);
+    f.setAttribute('x', '0'); f.setAttribute('y', '0');
+    f.setAttribute('width', '100%'); f.setAttribute('height', '100%');
+    /* must be sRGB, otherwise the channel encoding is remapped non-linearly */
+    f.setAttribute('color-interpolation-filters', 'sRGB');
+
+    var im = document.createElementNS(NS, 'feImage');
+    im.setAttribute('href', map.url);
+    im.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', map.url);
+    im.setAttribute('x', '0'); im.setAttribute('y', '0');
+    im.setAttribute('width', String(w)); im.setAttribute('height', String(h));
+    im.setAttribute('preserveAspectRatio', 'none');
+    im.setAttribute('result', 'LG_MAP');
+    f.appendChild(im);
+
+    if (!dispersion){
+      var dm = document.createElementNS(NS, 'feDisplacementMap');
+      dm.setAttribute('in', 'SourceGraphic'); dm.setAttribute('in2', 'LG_MAP');
+      dm.setAttribute('scale', String(map.scale));
+      dm.setAttribute('xChannelSelector', 'R'); dm.setAttribute('yChannelSelector', 'G');
+      f.appendChild(dm);
+    } else {
+      var chan = [
+        ['1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0', 0.93],
+        ['0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0', 1.00],
+        ['0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0', 1.09]
+      ];
+      chan.forEach(function(c, idx){
+        var cm = document.createElementNS(NS, 'feColorMatrix');
+        cm.setAttribute('in', 'SourceGraphic'); cm.setAttribute('type', 'matrix');
+        cm.setAttribute('values', c[0]); cm.setAttribute('result', 'LG_C' + idx);
+        f.appendChild(cm);
+        var d = document.createElementNS(NS, 'feDisplacementMap');
+        d.setAttribute('in', 'LG_C' + idx); d.setAttribute('in2', 'LG_MAP');
+        d.setAttribute('scale', String(map.scale * c[1]));
+        d.setAttribute('xChannelSelector', 'R'); d.setAttribute('yChannelSelector', 'G');
+        d.setAttribute('result', 'LG_D' + idx);
+        f.appendChild(d);
+      });
+      var b1 = document.createElementNS(NS, 'feBlend');
+      b1.setAttribute('in', 'LG_D0'); b1.setAttribute('in2', 'LG_D1');
+      b1.setAttribute('mode', 'screen'); b1.setAttribute('result', 'LG_DG');
+      f.appendChild(b1);
+      var b2 = document.createElementNS(NS, 'feBlend');
+      b2.setAttribute('in', 'LG_DG'); b2.setAttribute('in2', 'LG_D2');
+      b2.setAttribute('mode', 'screen');
+      f.appendChild(b2);
+    }
+    host.appendChild(f);
+  }
+
+  function applyTo(el){
+    var opts = el.__lgOpts || {};
+    var w = Math.round(el.offsetWidth);
+    var h = Math.round(el.offsetHeight);
+    if (w < 4 || h < 4) return;
+    var key = w + 'x' + h + '|' + (opts.ior || 1.5) + '|' + (opts.bevel || 0) + '|' + (opts.thickness || 0);
+    if (el.__lgKey === key && el.dataset.lgReady) return;
+    el.__lgKey = key;
+    var entry = cache[key];
+    if (!entry){
+      var map = buildMap(w, h, {
+        bevel: opts.bevel, thickness: opts.thickness,
+        ior: opts.ior, strength: opts.strength, radius: opts.radius
+      });
+      var id = 'lg' + (uid++);
+      buildFilter(id, map, w, h, Math.min(w, h) >= 96);
+      entry = cache[key] = { id: id, scale: map.scale, maxMag: map.maxMag };
+    }
+    el.__lgEntry = entry;
+    var val = 'blur(' + (opts.blur != null ? opts.blur : 5) + 'px) saturate(' + (opts.saturate || 1.7) +
+              ') brightness(' + (opts.brightness || 1.03) + ') url(#' + entry.id + ')';
+    el.style.backdropFilter = val;
+    el.style.webkitBackdropFilter = val;
+    el.dataset.lgReady = '1';
+  }
+
+  function attach(el, opts){
+    el.__lgOpts = opts || {};
+    if (!el.__lgRO && window.ResizeObserver){
+      el.__lgRO = new ResizeObserver(debounce(function(){ applyTo(el); }, 130));
+      el.__lgRO.observe(el);
+    }
+    applyTo(el);
+  }
+
+  function scan(root){
+    var list = (root || document).querySelectorAll('[data-glass]');
+    Array.prototype.forEach.call(list, function(el){
+      if (el.__lgBound) return;
+      el.__lgBound = true;
+      attach(el, {
+        blur: parseFloat(el.dataset.glassBlur || '') || 5,
+        thickness: parseFloat(el.dataset.glassThickness || '') || null,
+        bevel: parseFloat(el.dataset.glassBevel || '') || null,
+        ior: parseFloat(el.dataset.glassIor || '') || 1.5,
+        saturate: parseFloat(el.dataset.glassSaturate || '') || 1.7
+      });
+    });
+  }
+
+  return {
+    scan: scan,
+    refresh: function(el){ el.__lgKey = null; applyTo(el); },
+    stats: function(){ return { filters: uid, cache: Object.keys(cache).length }; }
+  };
+})();
+
+/* ============================================================================
+   2. ECG WAVEFORM MODEL — synthesised single-lead trace
+   ========================================================================== */
+var ECG = (function(){
+  function g(p, mu, amp, sd){
+    var d = p - mu; if (d > 0.5) d -= 1; else if (d < -0.5) d += 1;
+    return amp * Math.exp(-(d * d) / (2 * sd * sd));
+  }
+  /* phase 0..1 -> normalised millivolts, roughly -0.35 .. 1.05 */
+  function wave(p){
+    p = p - Math.floor(p);
+    return g(p, 0.16, 0.11, 0.026)   /* P  */
+         + g(p, 0.246, -0.13, 0.014) /* Q  */
+         + g(p, 0.272, 1.00, 0.016)  /* R  */
+         + g(p, 0.308, -0.29, 0.015) /* S  */
+         + g(p, 0.46, 0.26, 0.047);  /* T  */
+  }
+  return { wave: wave };
+})();
+
+/* ============================================================================
+   3. SIMULATION STATE
+   ----------------------------------------------------------------------------
+   Two clocks on purpose:
+     · the physiology (beats, waveform, vitals) runs in REAL time so the
+       monitor reads like a monitor;
+     · the trend timeline runs compressed (SPEED×) so 25 minutes of history
+       is legible within a session.
+   ========================================================================== */
+var SPEED = 20;                      /* simulated seconds per real second */
+var WINDOW = 25 * 60;                /* timeline span, simulated seconds  */
+var SAMPLE_DT = 15;                  /* history sample interval           */
+
+var S = {
+  t: 13 * 3600 + 15 * 60,
+  t0: null,
+  paused: false,
+  bpm: 62, bpmBase: 62,
+  sys: 92, dia: 57,
+  spo2: 99,
+  crp: 0.52,
+  hs: 120,
+  micro: 2000,
+  blood: 16,
+  age: 25,
+  art: 82,
+  beatPhase: 0,
+  beatPulse: 0,
+  spot: 0
+};
+
+var HIST = { hr: [], spo2: [], crp: [], hs: [], micro: [], age: [], bp: [] };
+var lastSample = 0;
+var events = [];                     /* {t, kind} markers on the timeline */
+
+function seed(){
+  S.t = 13 * 3600 + 15 * 60;
+  S.bpmBase = 62; S.bpm = 62;
+  S.sys = 92; S.dia = 57; S.spo2 = 99; S.crp = 0.52;
+  S.hs = 120; S.micro = 2000; S.blood = 16; S.age = 25; S.art = 82;
+  S.beatPhase = 0; S.beatPulse = 0;
+  Object.keys(HIST).forEach(function(k){ HIST[k] = []; });
+  events = [];
+  /* back-fill 25 minutes of plausible history so the first view is populated */
+  var back = WINDOW / SAMPLE_DT;
+  for (var i = back; i >= 0; i--){
+    var tt = S.t - i * SAMPLE_DT;
+    var drift = Math.sin(i / 14) * 0.5 + Math.sin(i / 37) * 0.7;
+    var hr = 62 + Math.sin(i / 9) * 2.2 + drift * 3.1;
+    HIST.hr.push({ t: tt, v: hr });
+    HIST.spo2.push({ t: tt, v: 99 + Math.sin(i / 11) * 0.7 - (i % 23 === 0 ? 1 : 0) });
+    HIST.crp.push({ t: tt, v: 0.5 + Math.sin(i / 21) * 0.16 + drift * 0.07 });
+    HIST.hs.push({ t: tt, v: 120 + Math.sin(i / 7) * 2.4 });
+    HIST.micro.push({ t: tt, v: 2000 + Math.sin(i / 17) * 120 + drift * 90 });
+    HIST.age.push({ t: tt, v: 25 + Math.sin(i / 45) * 0.6 });
+    HIST.bp.push({ t: tt, v: 92 + Math.sin(i / 13) * 3.4 + drift * 2.2 });
+    if (i % 43 === 0) events.push({ t: tt, kind: i % 86 === 0 ? 'peak' : 'mark' });
+  }
+  lastSample = S.t;
+}
+seed();
+
+/* mean-reverting random walk with respiratory sinus arrhythmia */
+function step(dtReal){
+  var dtSim = dtReal * SPEED;
+  S.t += dtSim;
+
+  var rsa = Math.sin(S.t * 0.052) * 2.4 + Math.sin(S.t * 0.021) * 1.3;
+  S.bpmBase = lerp(S.bpmBase, 62, 0.006);
+  var bpmTarget = S.bpmBase + rsa;
+  S.bpm = lerp(S.bpm, bpmTarget, 0.05) + (Math.random() - 0.5) * 0.35;
+  S.bpm = clamp(S.bpm, 52, 84);
+
+  S.sys = clamp(lerp(S.sys, 91, 0.004) + (Math.random() - 0.5) * 0.5, 84, 104);
+  S.dia = clamp(lerp(S.dia, 56, 0.004) + (Math.random() - 0.5) * 0.36, 50, 68);
+  S.spo2 = clamp(lerp(S.spo2, 99, 0.01) + (Math.random() - 0.5) * 0.06, 96, 100);
+  S.crp = clamp(lerp(S.crp, 0.5, 0.002) + (Math.random() - 0.5) * 0.0016, 0.2, 1.4);
+  S.hs = clamp(lerp(S.hs, 120, 0.03) + (Math.random() - 0.5) * 0.9, 112, 128);
+  S.micro = clamp(lerp(S.micro, 2000, 0.02) + (Math.random() - 0.5) * 9, 1700, 2350);
+  S.art = clamp(lerp(S.art, 82, 0.02) + (Math.random() - 0.5) * 0.4, 70, 94);
+
+  /* beat clock runs in REAL time */
+  S.beatPhase += dtReal * (S.bpm / 60);
+  if (S.beatPhase >= 1){
+    S.beatPhase -= 1;
+    S.beatPulse = 1;
+    onBeat();
+  }
+  S.beatPulse *= Math.pow(0.0015, dtReal);         /* ~exponential decay */
+
+  if (S.t - lastSample >= SAMPLE_DT){
+    lastSample = S.t;
+    push(S.hr, S.bpm); push(HIST.spo2, S.spo2); push(HIST.crp, S.crp);
+    push(HIST.hs, S.hs); push(HIST.micro, S.micro); push(HIST.age, S.age);
+    push(HIST.bp, S.sys);
+    if (Math.random() < 0.16) events.push({ t: S.t, kind: Math.random() < 0.4 ? 'peak' : 'mark' });
+    var cutoff = S.t - WINDOW * 1.6;
+    events = events.filter(function(e){ return e.t >= cutoff; });
+  }
+}
+function push(arr, v){ arr.push({ t: S.t, v: v }); if (arr.length > 400) arr.shift(); }
+
+var beatHandlers = [];
+function onBeat(){ for (var i = 0; i < beatHandlers.length; i++) beatHandlers[i](); }
+
+/* ============================================================================
+   4. VIEW LAYER
+   ========================================================================== */
+var dash = document.getElementById('dash');
+var el = {
+  sysVal: $('#sysVal'), diaVal: $('#diaVal'), bpState: $('#bpState'),
+  hsVal: $('#hsVal'), hsState: $('#hsState'),
+  hrNum: $('#hrNum'), rhythmState: $('#rhythmState'),
+  artState: $('#artState'), spo2State: $('#spo2State'),
+  ageDelta: $('#ageDelta'),
+  tlClock: $('#tlClock'), timelineEnd: $('#timelineEnd'), tlLive: $('#tlLive'),
+  tlSvg: $('#tlSvg'), timeline: $('#timeline'), tlTip: $('#tlTip'),
+  tipBpm: $('#tipBpm'), tipTime: $('#tipTime'), tipNote: $('#tipNote'),
+  tlCursor: $('#tlCursor'), tlHit: $('#tlHit'),
+  ecgPath: $('#ecgPath'), artNet: $('#artNet'),
+  crpMark: $('#crpMark'), crpFill: $('#crpFill'),
+  vesselPaths: $('#vesselPaths'), vesselNodes: $('#vesselNodes'), vessels: $('#vessels'),
+  drawer: $('#drawer'), card: $('#card'), spark: $('#spark'), sparkLine: $('#sparkLine'),
+  sparkArea: $('#sparkArea'), sparkDot: $('#sparkDot'), sparkAxes: $('#sparkAxes')
+};
+var displayed = { sys: 92, dia: 57, hs: 120, bpm: 62, crp: 0.5, spo2: 99 };
+
+/* ---------- 4.1 live waveform in the "Heart rhythm" symbol ---------- */
+var ECG_N = 76, ECG_VB = 40;
+function renderECG(){
+  var span = 1.5;                       /* beats visible across the icon */
+  var d = [], i, ph, y;
+  for (i = 0; i < ECG_N; i++){
+    ph = S.beatPhase + (i / (ECG_N - 1)) * span;
+    y = 20 - ECG.wave(ph) * 8.2 - 1.4;
+    d.push((i === 0 ? 'M' : 'L') + (2 + i * (36 / (ECG_N - 1))).toFixed(2) + ' ' + y.toFixed(2));
+  }
+  el.ecgPath.setAttribute('d', d.join(''));
+}
+
+/* ---------- 4.2 timeline ---------- */
+var TICKS = 30, LABELS = 7, EVNODES = 14;
+var tlNodes = { ticks: [], labels: [], events: [], band: null, nowLine: null, nowDot: null };
+function buildTimeline(){
+  var svg = el.tlSvg;
+  svg.innerHTML = '';
+  var defs = document.createElementNS(NS, 'defs');
+  defs.innerHTML = '<pattern id="tlDots" width="6" height="6" patternUnits="userSpaceOnUse">' +
+    '<circle cx="1" cy="1" r=".55" fill="#ffffff" opacity=".5"/></pattern>';
+  svg.appendChild(defs);
+
+  var i;
+  tlNodes.band = document.createElementNS(NS, 'rect');
+  tlNodes.band.setAttribute('y', '11%'); tlNodes.band.setAttribute('fill', '#d9ef40');
+  tlNodes.band.setAttribute('opacity', '.92'); tlNodes.band.setAttribute('rx', '1');
+  svg.appendChild(tlNodes.band);
+
+  for (i = 0; i < TICKS; i++){
+    var t = document.createElementNS(NS, 'line');
+    t.setAttribute('stroke', '#ffffff'); t.setAttribute('opacity', '.34');
+    t.setAttribute('vector-effect', 'non-scaling-stroke');
+    svg.appendChild(t); tlNodes.ticks.push(t);
+  }
+  for (i = 0; i < LABELS; i++){
+    var x = document.createElementNS(NS, 'text');
+    x.setAttribute('fill', '#f9faee'); x.setAttribute('font-size', '9');
+    x.setAttribute('font-family', 'Inter,Helvetica,Arial,sans-serif');
+    x.setAttribute('text-anchor', 'middle'); x.setAttribute('y', '0');
+    svg.appendChild(x); tlNodes.labels.push(x);
+  }
+  for (i = 0; i < EVNODES; i++){
+    var c = document.createElementNS(NS, 'circle');
+    c.setAttribute('fill', '#eff7c8'); c.setAttribute('r', '2');
+    svg.appendChild(c); tlNodes.events.push(c);
+  }
+  tlNodes.nowLine = document.createElementNS(NS, 'line');
+  tlNodes.nowLine.setAttribute('stroke', '#ffffff'); tlNodes.nowLine.setAttribute('stroke-width', '1');
+  tlNodes.nowLine.setAttribute('vector-effect', 'non-scaling-stroke');
+  svg.appendChild(tlNodes.nowLine);
+  tlNodes.nowDot = document.createElementNS(NS, 'circle');
+  tlNodes.nowDot.setAttribute('fill', '#ffffff'); tlNodes.nowDot.setAttribute('r', '2.6');
+  svg.appendChild(tlNodes.nowDot);
+}
+buildTimeline();
+
+function seriesAt(arr, t){
+  if (!arr.length) return 0;
+  if (t <= arr[0].t) return arr[0].v;
+  for (var i = arr.length - 1; i >= 0; i--){
+    if (arr[i].t <= t){
+      if (i === arr.length - 1) return arr[i].v;
+      var a = arr[i], b = arr[i + 1];
+      var r = (t - a.t) / Math.max(1, (b.t - a.t));
+      return lerp(a.v, b.v, clamp(r, 0, 1));
+    }
+  }
+  return arr[0].v;
+}
+
+function renderTimeline(){
+  var W = el.timeline.clientWidth, H = el.timeline.clientHeight;
+  if (!W || !H) return;
+  el.tlSvg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  el.tlSvg.setAttribute('width', W); el.tlSvg.setAttribute('height', H);
+
+  var end = S.t, start = end - WINDOW;
+  var X = function(t){ return (t - start) / WINDOW * W; };
+  var labelY = H - 3, tickTop = H * 0.21;
+
+  var i, n;
+  for (i = 0; i < TICKS; i++){
+    var ft = start + i / (TICKS - 1) * WINDOW;
+    var snap = Math.floor(ft / 60) * 60;
+    var px = X(snap);
+    n = tlNodes.ticks[i];
+    n.setAttribute('x1', px); n.setAttribute('x2', px);
+    n.setAttribute('y1', tickTop); n.setAttribute('y2', tickTop + (i % 5 === 0 ? H * 0.16 : H * 0.08));
+    n.setAttribute('opacity', (px < -2 || px > W + 2) ? 0 : (i % 5 === 0 ? 0.55 : 0.28));
+  }
+  /* pick a label cadence that keeps ~62px between labels at this width */
+  var needS = 62 * WINDOW / W;
+  var STEPS = [300, 600, 900, 1200, 1800, 3600];
+  var labStepSim = STEPS[STEPS.length - 1];
+  for (i = 0; i < STEPS.length; i++){ if (STEPS[i] >= needS){ labStepSim = STEPS[i]; break; } }
+  var firstLab = Math.floor(start / labStepSim) * labStepSim;
+  for (i = 0; i < LABELS; i++){
+    n = tlNodes.labels[i];
+    var lt = firstLab + i * labStepSim;
+    var lx = X(lt);
+    if (lx < 9 || lx > W - 9 || lt > end){ n.setAttribute('opacity', 0); continue; }
+    n.setAttribute('x', lx); n.setAttribute('y', labelY);
+    n.textContent = fmtClock(lt);
+    n.setAttribute('opacity', 0.9);
+  }
+  /* the lime band tracks where HR sat above the resting envelope */
+  var hiFrom = -1, hiTo = -1, cur;
+  for (i = 0; i < HIST.hr.length; i++){
+    cur = HIST.hr[i].t;
+    if (cur < start) continue;
+    if (HIST.hr[i].v > 63.4){
+      if (hiFrom < 0) hiFrom = cur;
+      hiTo = cur;
+    }
+  }
+  if (hiFrom >= 0 && hiTo > hiFrom){
+    tlNodes.band.setAttribute('x', X(hiFrom));
+    tlNodes.band.setAttribute('width', Math.max(3, X(hiTo) - X(hiFrom)));
+    tlNodes.band.setAttribute('height', H * 0.13);
+    tlNodes.band.setAttribute('opacity', 0.92);
+  } else {
+    tlNodes.band.setAttribute('width', 0);
+  }
+  var shown = events.filter(function(e){ return e.t >= start; });
+  for (i = 0; i < EVNODES; i++){
+    n = tlNodes.events[i];
+    if (i < shown.length){
+      n.setAttribute('cx', X(shown[i].t).toFixed(1));
+      n.setAttribute('cy', H * 0.26);
+      n.setAttribute('r', shown[i].kind === 'peak' ? 2.6 : 1.9);
+      n.setAttribute('opacity', shown[i].kind === 'peak' ? 1 : 0.8);
+    } else n.setAttribute('opacity', 0);
+  }
+  var nx = X(end);
+  tlNodes.nowLine.setAttribute('x1', nx); tlNodes.nowLine.setAttribute('x2', nx);
+  tlNodes.nowLine.setAttribute('y1', 0); tlNodes.nowLine.setAttribute('y2', H);
+  tlNodes.nowLine.setAttribute('opacity', 0.85);
+  tlNodes.nowDot.setAttribute('cx', nx); tlNodes.nowDot.setAttribute('cy', tickTop);
+  el.timelineEnd.textContent = fmtClock(end + 5 * 60);
+}
+
+/* ---------- 4.3 vitals ---------- */
+function setText(node, v){ if (node.textContent !== v) node.textContent = v; }
+
+function flashPulse(node){
+  if (REDUCED) return;
+  node.classList.remove('pulse');
+  void node.offsetWidth;
+  node.classList.add('pulse');
+  setTimeout(function(){ node.classList.remove('pulse'); }, 460);
+}
+
+var prevSys = null, prevHs = null;
+function renderVitals(){
+  setText(el.sysVal, String(Math.round(displayed.sys)));
+  setText(el.diaVal, String(Math.round(displayed.dia)));
+  setText(el.hsVal, String(Math.round(displayed.hs)));
+  setText(el.hrNum, String(Math.round(displayed.bpm)));
+
+  var bpLabel = displayed.sys >= 96 ? tr('bpElevated') : (displayed.sys <= 88 ? tr('bpLow') : tr('bpHN'));
+  setText(el.bpState, bpLabel);
+  var hsLabel = displayed.hs > 124 ? tr('hsStrong') : (displayed.hs < 116 ? tr('hsSoft') : tr('hsOptimal'));
+  setText(el.hsState, hsLabel);
+
+  var bpm = displayed.bpm;
+  setText(el.rhythmState, bpm > 78 ? tr('rTachy') : (bpm < 56 ? tr('rBrady') : (Math.abs(bpm - 62) > 8 ? tr('rVaried') : tr('rNormal'))));
+
+  var sp = displayed.spo2;
+  setText(el.spo2State, sp >= 98.4 ? tr('spNormal') : (sp >= 97 ? tr('spFair') : tr('spWatch')));
+  setText(el.artState, S.art > 88 ? tr('artExcellent') : (S.art > 78 ? tr('artMonitor') : tr('artReview')));
+
+  var crpMark = clamp(S.crp / 3, 0, 1);
+  var cx = 9 + crpMark * 206;
+  el.crpMark.setAttribute('cx', cx.toFixed(1));
+  el.crpFill.setAttribute('cx', cx.toFixed(1));
+  el.crpFill.setAttribute('opacity', crpMark > 0.55 ? 0.34 : 0.2);
+  el.crpFill.setAttribute('fill', crpMark > 0.55 ? '#ffd76a' : '#e3f13e');
+
+}
+
+/* ---------- 4.4 oxygen wave (tileable scroll) ---------- */
+(function buildWave(){
+  var paths = document.querySelectorAll('.wave .wave-scroll');
+  var base = [
+    function(x){ return 45 + 13 * Math.sin(x * Math.PI * 2 / 110) + 6.5 * Math.sin(x * Math.PI * 4 / 110 + 0.9); },
+    function(x){ return 45 + 9  * Math.sin(x * Math.PI * 2 / 110 + 2.1) + 4.5 * Math.sin(x * Math.PI * 4 / 110); },
+    function(x){ return 45 + 5.5 * Math.sin(x * Math.PI * 2 / 110 + 4.0) + 3 * Math.sin(x * Math.PI * 4 / 110 + 1.7); },
+    function(x){ return 45 + 19 * Math.sin(x * Math.PI * 2 / 110 + 5.3) + 9 * Math.sin(x * Math.PI * 4 / 110 + 3.1); }
+  ];
+  Array.prototype.forEach.call(paths, function(p, i){
+    var fn = base[i], d = [], x, first = true;
+    for (x = -120; x <= 340; x += 5){
+      d.push((first ? 'M' : 'L') + x.toFixed(1) + ' ' + clamp(fn(x), 6, 84).toFixed(2));
+      first = false;
+    }
+    p.setAttribute('d', d.join(''));
+  });
+})();
+
+/* ---------- 4.5 vessel network ---------- */
+(function buildVessels(){
+  var paths = [
+    'M59 30 Q55 38 56 46',                            /* carotid to the head   */
+    'M56 46 Q68 50 74 56 Q80 64 81 76 Q82 86 82 94',  /* left arm               */
+    'M56 46 Q44 50 38 58 Q32 66 30 78 Q28 88 28 94',  /* right arm              */
+    'M56 46 Q57 58 56 72 Q55 86 54 100',              /* aorta                  */
+    'M54 100 Q50 116 46 132',                         /* left leg               */
+    'M54 100 Q60 116 64 132',                         /* right leg              */
+    'M55 84 Q46 86 40 88',                            /* renal branch           */
+    'M74 56 Q70 49 67 43'                             /* subclavian             */
+  ];
+  var nodes = [[59,30],[56,46],[74,56],[38,58],[56,72],[54,100],[82,94],[28,94],
+               [46,132],[64,132],[40,88],[67,43]];
+  var NS_ = NS;
+  paths.forEach(function(d){
+    var base = document.createElementNS(NS_, 'path');
+    base.setAttribute('d', d);
+    el.vesselPaths.appendChild(base);
+    var flow = document.createElementNS(NS_, 'path');
+    flow.setAttribute('d', d); flow.setAttribute('class', 'flow');
+    flow.style.animationDelay = (-Math.random() * 3.4) + 's';
+    el.vesselPaths.appendChild(flow);
+  });
+  nodes.forEach(function(pt, i){
+    var r = document.createElementNS(NS_, 'circle');
+    r.setAttribute('class', 'ring'); r.setAttribute('cx', pt[0]); r.setAttribute('cy', pt[1]); r.setAttribute('r', 3.2);
+    r.style.animationDelay = (-i * 0.28) + 's';
+    el.vesselNodes.appendChild(r);
+    var c = document.createElementNS(NS_, 'circle');
+    c.setAttribute('class', 'node'); c.setAttribute('cx', pt[0]); c.setAttribute('cy', pt[1]);
+    c.setAttribute('r', 1.5 + Math.random() * 0.7);
+    el.vesselNodes.appendChild(c);
+  });
+})();
+
+/* ---------- 4.6 count-up on the big tile numbers ---------- */
+function countUp(node, to, dec, prefix){
+  if (REDUCED){ node.textContent = prefix + to.toFixed(dec); return; }
+  var from = parseFloat(node.getAttribute('data-count-from') || '0');
+  var t0 = 0, dur = 1100, done = false;
+  function finish(){ if (done) return; done = true; node.textContent = prefix + to.toFixed(dec); }
+  function frame(now){
+    if (done) return;
+    if (!t0) t0 = now;
+    var p = clamp((now - t0) / dur, 0, 1);
+    var e = 1 - Math.pow(1 - p, 3);
+    node.textContent = prefix + lerp(from, to, e).toFixed(dec);
+    if (p < 1) requestAnimationFrame(frame); else finish();
+  }
+  requestAnimationFrame(frame);
+  /* rAF-independent guarantee: a starved frame loop must never strand the value */
+  setTimeout(finish, dur + 300);
+}
+(function primeCounters(){
+  var list = document.querySelectorAll('[data-count]');
+  Array.prototype.forEach.call(list, function(n){
+    n.setAttribute('data-count-from', '0');
+    var to = parseFloat(n.getAttribute('data-count')) || 0;
+    var dec = parseInt(n.getAttribute('data-dec') || '0', 10);
+    var pre = n.getAttribute('data-prefix') || '';
+    setTimeout(function(){ countUp(n, to, dec, pre); }, 260 + Math.random() * 420);
+  });
+})();
+
+/* ============================================================================
+   5. INTERACTION
+   ========================================================================== */
+var toastEl = $('#toast');
+var toastTimer = 0;
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ toastEl.classList.remove('on'); }, 2100);
+}
+
+/* ---- 5.1 simulation transport ---- */
+var btnPlay = $('#btnPlay'), icoPlay = $('#icoPlay');
+
+/* the transport labels are locale-dependent, so they are derived, not inlined */
+function renderHint(){
+  var h = document.getElementById('hint');
+  if (h) h.textContent = tr(S.paused ? 'brandPaused' : 'brandHint', { x: SPEED });
+}
+function renderTransport(){
+  btnPlay.setAttribute('aria-label', tr(S.paused ? 'resume' : 'pause'));
+  renderHint();
+}
+
+function setPaused(p, silent){
+  S.paused = p;
+  dash.setAttribute('data-state', p ? 'paused' : 'live');
+  icoPlay.innerHTML = p
+    ? '<path d="M6.6 4.4l9.4 5.6-9.4 5.6z" fill="currentColor" stroke="none"/>'
+    : '<path d="M7.2 4.6v10.8M12.8 4.6v10.8"/>';
+  renderTransport();
+  renderDrawerMeta();
+  if (!silent) toast(tr(p ? 'tPaused' : 'tResumed'));
+}
+btnPlay.addEventListener('click', function(){ setPaused(!S.paused); });
+
+$('#btnReset').addEventListener('click', function(){
+  seed(); renderTimeline();
+  toast(tr('tReset'));
+});
+
+$('#btnSnapshot').addEventListener('click', function(){
+  var stamp = fmtClock(S.t);
+  events.push({ t: S.t, kind: 'peak' });
+  flashPulse(el.vSound);
+  toast(tr('tSnapshot', { time: stamp, bpm: Math.round(S.bpm) }));
+});
+
+var qAdd = $('#qAdd'), qExport = $('#qExport'), qVessels = $('#qVessels');
+qAdd.addEventListener('click', function(){
+  events.push({ t: S.t, kind: 'peak' });
+  S.bpmBase += 2.2;
+  toast(tr('tLogged'));
+});
+qVessels.addEventListener('click', function(){
+  var on = el.vessels.classList.toggle('on');
+  toast(tr(on ? 'tVesselOn' : 'tVesselOff'));
+});
+qExport.addEventListener('click', exportSession);
+
+function exportSession(){
+  var payload = {
+    exportedAt: new Date().toISOString(),
+    simulatedClock: fmtClock(S.t),
+    vitals: {
+      heartRate_bpm: +S.bpm.toFixed(1),
+      bloodPressure_mmHg: [+S.sys.toFixed(1), +S.dia.toFixed(1)],
+      spo2_pct: +S.spo2.toFixed(1),
+      hsCRP_mgL: +S.crp.toFixed(2),
+      heartAge_years: +S.age.toFixed(1),
+      microcirculation: Math.round(S.micro),
+      bloodwork_markers: Math.round(S.blood)
+    },
+    history: {
+      interval_s: SAMPLE_DT,
+      heartRate: HIST.hr.map(function(d){ return [+d.t.toFixed(0), +d.v.toFixed(2)]; }),
+      spo2: HIST.spo2.map(function(d){ return [+d.t.toFixed(0), +d.v.toFixed(2)]; })
+    },
+    events: events.map(function(e){ return { t: +e.t.toFixed(0), kind: e.kind }; })
+  };
+  var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'neka-session-' + fmtClock(S.t).replace(':', '') + '.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+  toast(tr('tExported'));
+  el.vessels.classList.add('on');
+  setTimeout(function(){ /* keep on */ }, 0);
+}
+
+/* ---- 5.2 timeline scrubbing + glass tooltip ---- */
+var scrubbing = false;
+var wasPaused = false;
+var tipX = null;              /* last tooltip anchor, so a language switch can re-render it */
+
+/* the LIVE / HISTORY badge is derived state: it is re-rendered from `badgeMode`
+   whenever the language changes, so a switch can never strand it. */
+var badgeMode = 'live', badgeT = null;
+function applyBadge(){
+  var m = document.getElementById('tlMode');
+  var c = document.getElementById('tlClock');
+  if (m) m.textContent = tr(badgeMode);
+  if (c) c.textContent = fmtClock(badgeT == null ? S.t : badgeT);
+}
+function setBadge(mode, t){ badgeMode = mode; badgeT = t; applyBadge(); }
+function pointerTime(clientX){
+  var r = el.timeline.getBoundingClientRect();
+  var p = clamp((clientX - r.left) / r.width, 0, 1);
+  return { t: S.t - WINDOW + p * WINDOW, x: p * r.width, w: r.width };
+}
+function showTip(clientX){
+  tipX = clientX;
+  var pt = pointerTime(clientX);
+  var bpm = seriesAt(HIST.hr, pt.t);
+  el.tipBpm.textContent = Math.round(bpm) + ' ' + tr('bpmShort');
+  el.tipTime.textContent = fmtClock(pt.t);
+  var note = bpm > 66 ? tr('noteActive') : (bpm < 58 ? tr('noteDeepRest') : tr('noteResting'));
+  el.tipNote.textContent = note;
+  el.tlTip.classList.add('on');
+  var tw = el.tlTip.offsetWidth || 120;
+  el.tlTip.style.left = clamp(pt.x - tw / 2, -6, pt.w - tw + 6) + 'px';
+  el.tlCursor.style.left = pt.x + 'px';
+  el.tlCursor.style.opacity = '1';
+  el.tlHit.setAttribute('aria-valuenow', String(Math.round((pt.t - (S.t - WINDOW)) / WINDOW * 100)));
+  el.tlHit.setAttribute('aria-valuetext', tr('ariaValueText', { time: fmtClock(pt.t), bpm: Math.round(bpm) }));
+  /* while scrubbing, the readouts preview that moment in history */
+  displayed.bpm = bpm;
+  displayed.sys = seriesAt(HIST.bp, pt.t);
+  displayed.spo2 = seriesAt(HIST.spo2, pt.t);
+  displayed.hs = seriesAt(HIST.hs, pt.t);
+  setBadge('history', pt.t);
+}
+function hideTip(){
+  el.tlTip.classList.remove('on');
+  el.tlCursor.style.opacity = '0';
+  setBadge('live', null);
+}
+el.tlHit.addEventListener('pointerdown', function(e){
+  scrubbing = true;
+  wasPaused = S.paused;
+  if (!S.paused) S.paused = true;
+  el.tlHit.setPointerCapture(e.pointerId);
+  showTip(e.clientX);
+});
+el.tlHit.addEventListener('pointermove', function(e){
+  if (scrubbing) showTip(e.clientX);
+});
+function endScrub(e){
+  if (!scrubbing) return;
+  scrubbing = false;
+  S.paused = wasPaused;
+  hideTip();
+  try { el.tlHit.releasePointerCapture(e.pointerId); } catch (err) {}
+}
+el.tlHit.addEventListener('pointerup', endScrub);
+el.tlHit.addEventListener('pointercancel', endScrub);
+el.tlHit.addEventListener('keydown', function(e){
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight'){
+    e.preventDefault();
+    var r = el.timeline.getBoundingClientRect();
+    var cx = r.left + (parseFloat(el.tlCursor.style.left) || r.width);
+    showTip(cx + (e.key === 'ArrowRight' ? 6 : -6));
+  } else if (e.key === 'Escape'){ hideTip(); }
+});
+
+/* ---- 5.3 detail drawer ---- */
+/* every piece of copy is referenced by dictionary key, never by literal */
+var METRICS = {
+  age:   { kicker: 'mAgeKicker', title: 'mAgeTitle', unit: 'mAgeUnit', src: 'mAgeSrc', us: 'mAgeUs',
+           dec: 0, series: function(){ return HIST.age; }, fmt: function(v){ return v.toFixed(0); },
+           good: 'down', live: function(){ return S.age; } },
+  spo2:  { kicker: 'mSpo2Kicker', title: 'mSpo2Title', unit: 'mSpo2Unit', src: 'mSpo2Src', us: 'mSpo2Us',
+           dec: 0, series: function(){ return HIST.spo2; }, fmt: function(v){ return v.toFixed(0); },
+           good: 'up', live: function(){ return S.spo2; } },
+  crp:   { kicker: 'mCrpKicker', title: 'mCrpTitle', unit: 'mCrpUnit', src: 'mCrpSrc', us: 'mCrpUs',
+           dec: 1, series: function(){ return HIST.crp; }, fmt: function(v){ return v.toFixed(1); },
+           good: 'down', live: function(){ return S.crp; } },
+  micro: { kicker: 'mMicroKicker', title: 'mMicroTitle', unit: 'mMicroUnit', src: 'mMicroSrc', us: 'mMicroUs',
+           dec: 0, series: function(){ return HIST.micro; }, fmt: function(v){ return v.toFixed(0); },
+           good: 'up', live: function(){ return S.micro; } },
+  blood: { kicker: 'mBloodKicker', title: 'mBloodTitle', unit: 'mBloodUnit', src: 'mBloodSrc', us: 'mBloodUs',
+           dec: 0, series: function(){ return HIST.age; }, fmt: function(v){ return v.toFixed(0); },
+           good: 'up', live: function(){ return S.blood; } }
+};
+var currentMetric = null;
+var drawerOpen = false;
+
+function seriesStats(arr){
+  if (!arr.length) return { min: 0, max: 0, avg: 0, sd: 0 };
+  var mn = Infinity, mx = -Infinity, sum = 0, i;
+  for (i = 0; i < arr.length; i++){ var v = arr[i].v; if (v < mn) mn = v; if (v > mx) mx = v; sum += v; }
+  var avg = sum / arr.length, acc = 0;
+  for (i = 0; i < arr.length; i++) acc += (arr[i].v - avg) * (arr[i].v - avg);
+  return { min: mn, max: mx, avg: avg, sd: Math.sqrt(acc / arr.length) };
+}
+
+function renderSpark(){
+  if (!currentMetric) return;
+  var m = METRICS[currentMetric];
+  var arr = m.series().slice(-100);
+  var W = 300, H = 100, pad = 6;
+  if (arr.length < 2){ el.sparkLine.setAttribute('d', ''); return; }
+  var st = seriesStats(arr);
+  var lo = st.min, hi = st.max;
+  if (hi - lo < 1e-6){ hi = lo + 1; lo -= 1; }
+  var span = hi - lo;
+  lo -= span * 0.16; hi += span * 0.16;
+  var X = function(i){ return pad + i / (arr.length - 1) * (W - pad * 2); };
+  var Y = function(v){ return H - pad - (v - lo) / (hi - lo) * (H - pad * 2); };
+  var d = [], i;
+  for (i = 0; i < arr.length; i++) d.push((i === 0 ? 'M' : 'L') + X(i).toFixed(2) + ' ' + Y(arr[i].v).toFixed(2));
+  el.sparkLine.setAttribute('d', d.join(''));
+  el.sparkArea.setAttribute('d', d.join('') + 'L' + X(arr.length - 1).toFixed(2) + ' ' + H + 'L' + X(0).toFixed(2) + ' ' + H + 'Z');
+  var last = arr[arr.length - 1];
+  el.sparkDot.setAttribute('cx', X(arr.length - 1).toFixed(2));
+  el.sparkDot.setAttribute('cy', Y(last.v).toFixed(2));
+
+  var ax = '', g;
+  el.sparkAxes.innerHTML = '';
+  for (g = 1; g <= 3; g++){
+    var yy = pad + g / 4 * (H - pad * 2);
+    ax += '<line class="axis" x1="' + pad + '" x2="' + (W - pad) + '" y1="' + yy.toFixed(1) + '" y2="' + yy.toFixed(1) + '"/>';
+  }
+  el.sparkAxes.innerHTML = ax;
+
+  $('#stMin').textContent = m.fmt(st.min);
+  $('#stAvg').textContent = m.fmt(st.avg);
+  $('#stMax').textContent = m.fmt(st.max);
+  $('#stVar').textContent = (st.sd > 0 && st.sd < 1) ? st.sd.toFixed(2) : m.fmt(st.sd);
+
+  var first = arr[0].v, delta = last.v - first;
+  var improving = (m.good === 'up') ? delta > 0 : delta < 0;
+  var dEl = $('#cardDelta');
+  var mag = Math.abs(delta);
+  if (mag < (m.dec ? 0.05 : 0.6)){ dEl.textContent = tr('stable'); dEl.className = 'card-delta'; }
+  else {
+    dEl.textContent = (delta > 0 ? '+' : '−') + m.fmt(mag) + ' ' + tr(m.us);
+    dEl.className = 'card-delta' + (improving ? '' : ' warn');
+  }
+}
+
+/* the drawer header is rebuilt on open and again on every language switch */
+/* live/paused chip + sample tally; driven on open, on toggle and on switch,
+   not only from the frame loop */
+function renderDrawerMeta(){
+  if (!drawerOpen || !currentMetric) return;
+  var m = METRICS[currentMetric];
+  $('#metaState').textContent = tr(S.paused ? 'metaPaused' : 'metaLive');
+  $('#metaSamples').textContent = tr('samples', { n: m.series().length });
+}
+
+function applyMetricLabels(key){
+  var m = METRICS[key]; if (!m) return;
+  $('#cardKicker').textContent = tr(m.kicker);
+  $('#cardTitle').textContent = tr(m.title);
+  $('#cardUnit').textContent = tr(m.unit);
+  $('#metaSrc').textContent = tr(m.src);
+  $('#card').setAttribute('data-metric', key);
+  renderDrawerMeta();
+}
+
+function openDrawer(key){
+  var m = METRICS[key]; if (!m) return;
+  currentMetric = key;
+  applyMetricLabels(key);
+  drawerOpen = true;
+  el.drawer.classList.add('on');
+  el.drawer.setAttribute('aria-hidden', 'false');
+  document.body.setAttribute('data-drawer', '1');
+  renderSpark();
+  if (!REDUCED){
+    var line = el.sparkLine, len = line.getTotalLength ? line.getTotalLength() : 600;
+    line.style.strokeDasharray = len; line.style.strokeDashoffset = len;
+    line.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }], { duration: 780, easing: 'cubic-bezier(.3,.8,.3,1)', fill: 'forwards' });
+    line.style.strokeDasharray = '';
+    line.style.strokeDashoffset = 0;
+  }
+  setTimeout(function(){ $('#cardClose').focus(); }, 60);
+}
+function closeDrawer(){
+  drawerOpen = false; currentMetric = null;
+  el.drawer.classList.remove('on');
+  el.drawer.setAttribute('aria-hidden', 'true');
+  document.body.removeAttribute('data-drawer');
+}
+Array.prototype.forEach.call(document.querySelectorAll('.tile[data-metric]'), function(tile){
+  tile.addEventListener('click', function(){ openDrawer(tile.dataset.metric); });
+  tile.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openDrawer(tile.dataset.metric); }
+  });
+});
+$('#cardClose').addEventListener('click', closeDrawer);
+$('#drawerScrim').addEventListener('click', closeDrawer);
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape' && drawerOpen) closeDrawer();
+  else if (e.key === ' ' && !drawerOpen && document.activeElement === document.body){ e.preventDefault(); setPaused(!S.paused); }
+});
+
+/* ---- 5.4 hover tooltips on the quick rail ---- */
+var tipEl = null, tipAnchor = null;
+function showHoverTip(b){
+  /* the label is read at show time, so a language switch is always picked up */
+  var label = b.dataset.tip || b.getAttribute('aria-label');
+  if (!label) return;
+  if (!tipEl){
+    tipEl = document.createElement('div');
+    tipEl.className = 'tl-tip glass';
+    tipEl.setAttribute('data-glass', '1');
+    document.body.appendChild(tipEl);
+    Glass.scan(document.body);
+  }
+  tipEl.textContent = label;
+  var r = b.getBoundingClientRect();
+  tipEl.style.left = (r.right + 10) + 'px';
+  tipEl.style.top = (r.top + r.height / 2) + 'px';
+  tipEl.style.bottom = 'auto';
+  tipEl.style.transform = 'translateY(-50%)';
+  tipEl.style.opacity = '1';
+}
+Array.prototype.forEach.call(document.querySelectorAll('#qAdd,#qExport,#qVessels,#btnPlay,#btnReset,#btnSnapshot'), function(b){
+  b.addEventListener('pointerenter', function(){ tipAnchor = b; showHoverTip(b); });
+  b.addEventListener('pointerleave', function(){ tipAnchor = null; if (tipEl) tipEl.style.opacity = '0'; });
+});
+
+/* ============================================================================
+   6. FRAME LOOP
+   ========================================================================== */
+var last = 0, tlAcc = 0, ecgAcc = 0, sparkAcc = 0;
+function frame(now){
+  if (!last) last = now;
+  var dt = Math.min(0.05, (now - last) / 1000);
+  last = now;
+
+  if (!S.paused){
+    step(dt);
+  } else {
+    S.beatPulse *= Math.pow(0.002, dt);
+  }
+
+  /* exponential smoothing of the displayed numbers */
+  var k = 1 - Math.pow(0.02, dt);
+  if (!scrubbing){
+    displayed.bpm = lerp(displayed.bpm, S.bpm, k);
+    displayed.sys = lerp(displayed.sys, S.sys, k);
+    displayed.dia = lerp(displayed.dia, S.dia, k);
+    displayed.hs = lerp(displayed.hs, S.hs, k);
+    displayed.spo2 = lerp(displayed.spo2, S.spo2, k);
+  }
+
+  /* beat-reactive CSS variable */
+  dash.style.setProperty('--beat', (S.beatPulse * 0.9).toFixed(3));
+  dash.setAttribute('data-beat', S.beatPulse > 0.55 ? 'high' : 'low');
+
+  ecgAcc += dt;
+  if (ecgAcc > 1 / 30){ ecgAcc = 0; renderECG(); }
+
+  renderVitals();
+
+  tlAcc += dt;
+  if (tlAcc > 1 / 18){ tlAcc = 0; renderTimeline(); }
+
+  if (drawerOpen){
+    sparkAcc += dt;
+    if (sparkAcc > 1 / 6){ sparkAcc = 0; renderSpark(); }
+    if (currentMetric){
+      var m = METRICS[currentMetric];
+      $('#cardVal').textContent = m.fmt(m.live());
+      $('#metaState').textContent = tr(S.paused ? 'metaPaused' : 'metaLive');
+      $('#metaSamples').textContent = tr('samples', { n: m.series().length });
+    }
+  }
+
+  requestAnimationFrame(frame);
+}
+
+/* ============================================================================
+   7. BOOT
+   ========================================================================== */
+function boot(){
+  initLang();
+  bindLang();
+  Glass.scan(document);
+  renderTimeline();
+  renderECG();
+  renderVitals();
+  dash.setAttribute('data-state', 'live');
+  requestAnimationFrame(frame);
+
+  /* re-derive every glass map when the layout changes */
+  window.addEventListener('resize', debounce(function(){
+    Glass.scan(document);
+    Array.prototype.forEach.call(document.querySelectorAll('[data-glass]'), function(n){
+      Glass.refresh(n);
+    });
+  }, 200));
+}
+if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(boot, 0);
+else document.addEventListener('DOMContentLoaded', boot);
+})();
+</script>
+</body>
+</html>
